@@ -233,7 +233,7 @@
                   <span class="post-meta-item-text">{{ __('post.wordcount') }}&#58;</span>
                 {% endif %}
                 <span title="{{ __('post.wordcount') }}">
-                  {{ wordcount(post.content) }}
+                  {{ wordcount(post.content) }} 字
                 </span>
               {% endif %}
 
@@ -249,7 +249,7 @@
                   <span class="post-meta-item-text">{{ __('post.min2read') }} &asymp;</span>
                 {% endif %}
                 <span title="{{ __('post.min2read') }}">
-                  {{ min2read(post.content) }}
+                  {{ min2read(post.content) }} 分钟
                 </span>
               {% endif %}
             </div>
@@ -351,6 +351,15 @@
         {% include 'post-copyright.swig' with { post: post } %}
       </div>
     {% endif %}
+
+   <!-- 本文结束标记 -->
+   <div>
+     {% if not is_index %}
+       {% include 'passage-end-tag.swig' %}
+     {% endif %}
+   </div>
+   <!-- 本文结束标记END -->
+
 
     <footer class="post-footer">
       {% if post.tags and post.tags.length and not is_index %}

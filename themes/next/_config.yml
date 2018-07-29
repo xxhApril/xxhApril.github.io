@@ -49,6 +49,7 @@ footer:
 
   # Icon between year and copyright info.
   icon: user
+  counter: true
 
   # If not defined, will be used `author` from Hexo main config.
   copyright:
@@ -126,8 +127,9 @@ scheme: Pisces
 # Key is the link label showing to end users.
 # Value before `||` delimeter is the target permalink.
 # Value after `||` delimeter is the name of FontAwesome icon. If icon (with or without delimeter) is not specified, globe icon will be loaded.
-#social:
-  #GitHub: https://github.com/yourname || github
+social:
+  GitHub: https://github.com/xxhApril || github
+  微博: https://weibo.com/
   #E-Mail: mailto:yourname@gmail.com || envelope
   #Google: https://plus.google.com/yourname || google
   #Twitter: https://twitter.com/yourname || twitter
@@ -143,6 +145,9 @@ social_icons:
   icons_only: false
   transition: false
 
+  GitHub: github 
+  微博: weibo 
+
 # Blog rolls
 links_icon: link
 links_title: Links
@@ -154,7 +159,7 @@ links_layout: block
 # Sidebar Avatar
 # in theme directory(source/images): /images/avatar.gif
 # in site  directory(source/uploads): /uploads/avatar.gif
-#avatar: /images/avatar.gif
+avatar: /images/avatar.png
 
 # Table Of Contents in the Sidebar
 toc:
@@ -230,9 +235,9 @@ post_meta:
 # Dependencies: https://github.com/willin/hexo-wordcount
 post_wordcount:
   item_text: true
-  wordcount: false
-  min2read: false
-  totalcount: false
+  wordcount: true
+  min2read: true
+  totalcount: true
   separated_meta: true
 
 # Wechat Subscriber
@@ -277,7 +282,7 @@ custom_logo:
 # Available value:
 #    normal | night | night eighties | night blue | night bright
 # https://github.com/chriskempson/tomorrow-theme
-highlight_theme: normal
+highlight_theme: night bright
 
 
 # ---------------------------------------------------------------
@@ -675,7 +680,7 @@ motion:
 fancybox: true
 
 # Progress bar in the top during page loading.
-pace: false
+pace: true
 # Themes list:
 #pace-theme-big-counter
 #pace-theme-bounce
@@ -692,10 +697,11 @@ pace: false
 #pace-theme-minimal
 # For example
 # pace_theme: pace-theme-center-simple
-pace_theme: pace-theme-minimal
+pace_theme: pace-theme-flash
+
 
 # Canvas-nest
-canvas_nest: true
+canvas_nest: false
 
 # three_waves
 three_waves: false
@@ -808,6 +814,25 @@ vendors:
 css: css
 js: js
 images: images
+
+# 文章结尾添加“本文结束”标记
+passage_end_tag:
+ enable: true
+
+since: 2018
+
+# title
+# links_title: Links
+# links:
+#   MacTalk: http://macshuo.com/
+#   Title: http://example.com/
+
+ # --------------------------------------------------------------
+# 动态背景设置
+# --------------------------------------------------------------
+# add canvas-nest effect
+# see detail from https://github.com/hustcc/canvas-nest.js
+# canvas_nest: true
 
 # Theme version
 version: 5.1.4

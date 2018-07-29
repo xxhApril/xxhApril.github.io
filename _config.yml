@@ -5,7 +5,7 @@
 # Site
 title: 风和向日葵
 subtitle: 
-description: 做人呐，最重要的就是开心 🤩
+description: 做人呐，最重要的就是开心
 author: Hsu
 language: zh-Hans
 timezone: UTC
@@ -80,3 +80,18 @@ deploy:
   type: git
   repository: https://github.com/xxhApril/xxhApril.github.io.git
   branch: master
+
+live2d:
+  enable: true
+  scriptFrom: local
+  pluginRootPath: live2dw/
+  pluginJsPath: lib/
+  pluginModelPath: assets/
+  model:
+    use: live2d-widget-model-koharu
+  display:
+    position: left
+    width: 100
+    height: 200
+  mobile:
+    show: true
