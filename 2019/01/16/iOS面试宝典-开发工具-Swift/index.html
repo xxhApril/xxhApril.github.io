@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.7.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"mac"},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="####1. Swift] ####2. Objective-C ####3. Swift VS Objective-C ####4. Xcode 使用">
+<meta name="keywords" content="ios 面试 swift">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS面试宝典 开发工具-Swift">
+<meta property="og:url" content="http://yoursite.com/2019/01/16/iOS面试宝典-开发工具-Swift/index.html">
+<meta property="og:site_name" content="风和向日葵">
+<meta property="og:description" content="####1. Swift] ####2. Objective-C ####3. Swift VS Objective-C ####4. Xcode 使用">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-10-30T01:58:16.936Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="iOS面试宝典 开发工具-Swift">
+<meta name="twitter:description" content="####1. Swift] ####2. Objective-C ####3. Swift VS Objective-C ####4. Xcode 使用">
+
+<link rel="canonical" href="http://yoursite.com/2019/01/16/iOS面试宝典-开发工具-Swift/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>iOS面试宝典 开发工具-Swift | 风和向日葵</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?f3be994bce43cea26cc0e3f96fe1c107";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">风和向日葵</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">四月的博客</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">2</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">0</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">3</span></a>
+
+  </li>
+        <li class="menu-item menu-item-commonweal">
+
+    <a href="/404/" rel="section"><i class="fa fa-fw fa-heartbeat"></i>公益 404</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/xxhApril" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/16/iOS面试宝典-开发工具-Swift/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Hsu">
+      <meta itemprop="description" content="记录一些知识，记录一些生活，记录一些足迹">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="风和向日葵">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          iOS面试宝典 开发工具-Swift
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-01-16 11:05:46" itemprop="dateCreated datePublished" datetime="2019-01-16T11:05:46Z">2019-01-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-10-30 01:58:16" itemprop="dateModified" datetime="2019-10-30T01:58:16Z">2019-10-30</time>
+              </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span></span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>NaN:aN</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>####1. Swift]</p>
+<p>####2. Objective-C</p>
+<p>####3. Swift VS Objective-C</p>
+<p>####4. Xcode 使用</p>
+ <a id="more"></a> 
+<!----------- 哈哈哈哈 ------------>
+<h2 id="1-Swift"><a href="#1-Swift" class="headerlink" title="1. Swift"></a>1. Swift</h2><p>在iOS开发中，语言选择是最初的一步，现在苹果公司主推的语言是 Swift。</p>
+<p>Swift 自 2014年发布以来，已经历经 4 个版本的迭代。其在 TIOBE 编程语言排行榜上，一度位列第 12 位，超过 Ruby 并远远甩开上一代语言 Objective-C。从性能上来说，它的速度是 Objective-C 的 2.6 倍，是 Python 的 8.4 倍。更重要的是，Swift 是一门开源的语言，它的性能和优化接受者整个业界的监督和关注。无论从哪个角度讲，Swift 都将取代 Objective-C，成为 iOS 开发的主流语言。</p>
+<p>所以，在面试中，关于 Swift 的问题越来越多。对于这门语言的熟悉程度，成为判断一名软件工程师水准的重要标准之一。下面的内容会从实战和理论连个角度来探讨 Swift 的特性。</p>
+<h3 id="Swift-面试理论题"><a href="#Swift-面试理论题" class="headerlink" title="Swift 面试理论题"></a>Swift 面试理论题</h3><h4 id="类（class）和结构体（struct）有什么区别"><a href="#类（class）和结构体（struct）有什么区别" class="headerlink" title="类（class）和结构体（struct）有什么区别"></a>类（class）和结构体（struct）有什么区别</h4><p><strong>关键词</strong>：<font color="red"><figure class="highlight plain"><figcaption><span>```#值类型```</span></figcaption></figure></font><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"> </span><br><span class="line">在 Swift 中，class 是引用类型，struct 是值类型。值类型在传递和赋值时将进行复制，而引用类型只会适用引用对象的一直“指向”。所以，两者之间的区别就是两个类型的区别。</span><br><span class="line"></span><br><span class="line">举一个简单的例子，代码如下：</span><br></pre></td></tr></table></p>
+<p>class Temperature {<br>    var value: Float = 30.0<br>}</p>
+<p>class Person {<br>    var temp: Temperature?</p>
+<pre><code>func sick() {
+    temp?.value = 40
+}
+</code></pre><p>}</p>
+<p>let A = Person()<br>let B = Person()<br>let temp = Temperature()</p>
+<p>A.temp = temp<br>B.temp = temp</p>
+<p>A.sick()<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">在上面这段代码，Temperature 是 class，为引用类型，故 A 的 temp 和 B 的 temp 指向同一个对象。A 的 temp 值被修改了，B 的 temp 值也会随着改变。如果将 Temperature 改为 struct，为值类型，则 A 的 temp 值的修改不会影响到 B 的 temp 值。</span><br><span class="line"></span><br><span class="line">在内存中，引用类型，诸如类，是在堆（heap）上进行存储和操作的；而值类型，诸如结构体，是在栈（stack）上进行存储和操作的，相比栈上的操作，堆上的操作更加复杂和耗时，所以苹果官方推荐使用结构体，这样可以提高 APP 的运行效率。</span><br><span class="line"></span><br><span class="line">**加分回答：**</span><br><span class="line"></span><br><span class="line">class 的如下功能是 struct 没有的：</span><br><span class="line"></span><br><span class="line">- 可以继承，这样子类可以使用父类的特性和方法。</span><br><span class="line">- 类型转换可以再运行时检查和解释一个实例的类型。</span><br><span class="line">- 可以用 deinit 来释放资源。</span><br><span class="line">- 一个类可以被多次引用。</span><br><span class="line"></span><br><span class="line">struct 也有如下优势：</span><br><span class="line"></span><br><span class="line">- 结构较小，适用于复制操作，相比一个 class 的实例被多次引用，struct 更加安全。</span><br><span class="line">- 无须担心内存泄漏或者多线程冲突问题。</span><br><span class="line"></span><br><span class="line">**类似问题：**</span><br><span class="line"></span><br><span class="line">引用类型和值类型有什么区别？struct 相比 class，在使用上有什么优势？</span><br><span class="line"></span><br><span class="line">#### Swift 是面向对象还是函数式的编程语言</span><br><span class="line"></span><br><span class="line">**关键词**：&lt;font color=&quot;red&quot;&gt;```#面向对象```  ```#函数式编程```&lt;/font&gt;</span><br><span class="line"></span><br><span class="line">Swift 既是面向对象的编程语言，又是函数式的编程语言。</span><br><span class="line"></span><br><span class="line">说 Swift 是面向对象的编程语言，是因为 Swift 支持类的封装、继承和多态，从这一点来看，Swift 与 Java 这类纯面向对象的编程语言几乎毫无差别。</span><br><span class="line"></span><br><span class="line">说 Swift 是函数是的编程语言，是因为 Swift 支持 map，reduce，filter，flatmap 这类除去中间状态、数学函数式的方法，更加强调运算结果而不是中间过程。</span><br><span class="line"></span><br><span class="line">**类似问题：**</span><br><span class="line"></span><br><span class="line">为什么说 Swift 是函数式的编程语言？</span><br><span class="line"></span><br><span class="line">#### 在 Swift 中，什么是可选型（optional）</span><br><span class="line"></span><br><span class="line">**关键词**：&lt;font color=&quot;red&quot;&gt;```#Optional```  ```#nil```&lt;/font&gt;</span><br><span class="line"></span><br><span class="line">在 Swift 中，可选型是为了表达当一个变量值为空的情况。当一个变量值为空时，它就是 nil。在 Swift 中，无论变量是引用类型还是值类型，都可以是可选型变量。下面举一个例子：</span><br></pre></td></tr></table></figure></p>
+<p>/// 值类型为 Float，value 默认值是 30.0<br>var value: Float = 30.0<br>/// 值类型为 String ,key 默认值为 nil<br>var key: String?<br>/// 引用类型为 UIImage， image 默认值为 nil<br>var image: UIImage?<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">**加分回答：**</span><br><span class="line"></span><br><span class="line">在 Objective-C 中没有明确提出可选型的概念，然而，其引用类型却可以为 nil，以此来标志其变量值为空的情况。而 Swift 将这一概念扩大到值类型，并且明确提出了可选性的概念。</span><br><span class="line"></span><br><span class="line">#### 在 Swift 中，什么是泛型（Generics）</span><br><span class="line">**关键词**：&lt;font color=&quot;red&quot;&gt;```#泛型```&lt;/font&gt;</span><br><span class="line"></span><br><span class="line">在 Swift 中，泛型主要是为了增加代码的灵活性而生的：它可以使对应的代码满足任意类型的变量或方法。</span><br><span class="line"></span><br><span class="line">举一个简单的例子：加入要写出一种方法可以交换两个 Int 值，其中一种写法如下：</span><br></pre></td></tr></table></figure></p>
+<p>func swap(_ a: inout Int, _ b: inout Int) {<br>    (a, b) = (b, a)<br>}<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">上面这种写法有用但并不高效。因为，加入需要实现一个方法用于交换两个 Float 值，那么又得重写一遍。泛型就是为了解决这类问题而来的：希望有个一般性的方法，可以交换任意类型的值。</span><br></pre></td></tr></table></figure></p>
+<p>func swap<t>(_ a: inout T, _ b: inout T) {<br>    (a, b) = (b, a)<br>}<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">**注意**，Swift 是类型安全的语言，所以这里交换两个变量的类型必须一致。</span><br><span class="line"></span><br><span class="line">#### 说明比较关键词：Open，Public，Internal，File-private和private</span><br><span class="line"></span><br><span class="line">**关键词**：&lt;font color=&quot;red&quot;&gt;```#访问控制权限```&lt;/font&gt;</span><br><span class="line"></span><br><span class="line">Swift 有五个级别的访问控制权限，从高到底一次为空 Open，Public，Internal，File-private 和 private。</span><br><span class="line"></span><br><span class="line">它们遵循的基本原则是：高级别的变量不允许被定义为低级别变量的成员变量。比如，一个 Private 的 class 中不能含有 Public 的 String。反之。低级别的变量却可以定义在高级别的变量中。比如，Public 的 class 中可以含有 Private 的 Int 值。</span><br><span class="line"></span><br><span class="line">- **Open** 具备最高的访问权限。其修饰的的类和方法可以在任意 Module 中被访问和重写；它是 Swift3 中新添加的访问权限。</span><br><span class="line">- **Public** 的权限仅次于 Open。与 Open 唯一的区别在于，它修饰的对象可以在任意 Module 中被访问，但不能重写。</span><br><span class="line">- **Internal** 是默认的权限。它表示只能在当前定义的 Module 中被访问和重写。它可以被一个 Module 中的多个文件访问，但不能被其他 Module 访问。</span><br><span class="line">- **File-private** 也是 Swift3 中新添加的权限。其修饰的对象只能在当前文件中使用。例如，它可以被一个文件中的 class、extension 和 struct 共同使用。</span><br><span class="line">- **Private** 是最低级别的访问权限。它的对象只能在定义的作用域内使用。离开了这个作用域，即使是同一个文件中的其他作用域，也无法访问。</span><br><span class="line"></span><br><span class="line">**类似问题：**</span><br><span class="line"></span><br><span class="line">Swift3 中新引入的 Open 和 File-private 关键词有什么用？</span><br><span class="line"></span><br><span class="line">#### 说明比较关键词：Strong，Weak 和 Unowned</span><br><span class="line"></span><br><span class="line">**关键词**：&lt;font color=&quot;red&quot;&gt;```#引用类型```    ```#内存管理``` &lt;/font&gt;</span><br><span class="line"></span><br><span class="line">Swift 的内存管理机制与 Objective-C 一样，都为 ARC（Automatic Reference Counting）。其基本原理是，一个对象在没有任何强引用指向它时，所占用的内存就会被回收。反之，只要有任何一个强引用指向该对象，它就会一直存在于内存中。</span><br><span class="line"></span><br><span class="line">- Strong 代表强引用，是默认属性。当一个对象被声明为 Strong 时，表示父层级对该对象有一个强引用的指向，此时，该对象的引用计数会增加1。</span><br><span class="line">- Weak 代表弱引用。当一个对象被声明为 Weak 时，表示父层级对该对象没有指向，该对象的引用计数不会增加1。在该对象被释放后，弱引用页随即消失。继续访问该对象，程序会到的 nil，不会崩溃。</span><br><span class="line">- Unowned 与弱引用的本质一样。唯一不同的是，该对象被释放后，依然有个无效的引用指向对象，它不是 Optional，也不指向 nil。如果继续访问该对象，则程序就会崩溃。</span><br><span class="line"></span><br><span class="line">**加分回答：**</span><br><span class="line"></span><br><span class="line">引入 Weak 和 Unowned，是为了解决由 Strong 带来的循环引用问题。简单地说，当两个对象互相有一个强引用指向对方时，就会导致两个对象在内存中无法被释放。</span><br><span class="line"></span><br><span class="line">Weak 和 Unowned de 使用场景有如下差别：</span><br><span class="line"></span><br><span class="line">- 当访问对象可能已经被释放时，则用 weak，比如 delegate 的修饰。</span><br><span class="line">- 当访问对象确定不可能被释放时，则用 unowned，比如 self 的引用。</span><br><span class="line"></span><br><span class="line">实际上，为了安全，很多公司规定任何时候都用 Weak 修饰。</span><br><span class="line"></span><br><span class="line">#### 在 Swift 中，如何理解 copy-on-write</span><br><span class="line"></span><br><span class="line">**关键词**：&lt;font color=&quot;red&quot;&gt;```#内存管理``` &lt;/font&gt;</span><br><span class="line"></span><br><span class="line">当值类型（比如 struct）在复制时，复制的对象和原对象实际上在内存中指向同一个对象。而且仅当修复制后的对象时，才会在内存中重新创建一个新的对象。下面举一个例子：</span><br></pre></td></tr></table></figure></t></p>
+<p>/// arrayA 是一个数组，为值类型<br>let arrayA = [1, 2, 3]<br>/// arrayB 这个时候与 arrayA 在内存中是同一个数组，内存中没有生成新的数组<br>var arrayB = arrayA<br>/// arrayB 被修改了，此时 arrayB 在内存中变成了一个新的数组，而不是原来的 arrayA 了<br>arrayB.append(4)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">从上面的代码可以看出，复制的数组与原数组共享一个地址，直到其中一个发生改变。这样的设计使得值类型可以被多次复制而无须耗费多余的内存，只有变化的时候才会增加开销。**因此内存的使用更加高效**。</span><br><span class="line"></span><br><span class="line">#### 什么是属性观察器（Property Observer）</span><br><span class="line"></span><br><span class="line">**关键词**：&lt;font color=&quot;red&quot;&gt;```#willSet```    ```#didSet``` &lt;/font&gt;</span><br></pre></td></tr></table></figure></p>
+<p>var title: String {<br>    willSet {<br>        print(“将标题从(title)设置到(newValue)”)<br>    }<br>    didSet {<br>        print(“将标题从(oldValue)设置到(title)”)<br>    }<br>}<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">上面这段代码对 title 进行了监听。在 title 发生改变前，willSet 对应的作用域将被执行，新的值是 newValue。在 title 发生改变后，didSet 对应的作用域将被执行，原来的值为 oldValue。这就是属性观察。</span><br><span class="line"></span><br><span class="line">**加分回答：**</span><br><span class="line"></span><br><span class="line">初始化方法对属性的设定，以及在 willSet 和 didSet 中对属性的再次设定，都不会触发调用属性观察器。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">### Swift 面试实战题</span><br><span class="line"></span><br><span class="line">#### 在结构体中如何修改成员变量的方法</span><br><span class="line"></span><br><span class="line">**关键词**：&lt;font color=&quot;red&quot;&gt;```#mutating``` &lt;/font&gt;</span><br><span class="line"></span><br><span class="line">请问下面的代码存在什么问题？</span><br></pre></td></tr></table></figure></p>
+<p>protocol Pet {<br>    var name: String { get set }<br>}</p>
+<p>struct MyDog: Pet {<br>    var name: String</p>
+<pre><code>func changeName(name: String) {
+    self.name = name
+}
+</code></pre><p>}<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">应该在 ```func changeName(name: String)``` 的前面加上关键词 ```mutating```,表示该方法会修改结构体中自己的成员变量。</span><br><span class="line"></span><br><span class="line">**注意**，再设计协议的时候，由于 protocol 可以被 class 或 struct 或 enum 实现，故而要考虑是否用 `mutating` 来修饰方法。</span><br><span class="line"></span><br><span class="line">类中不存在这个问题，因为类可以随意修改自己的成员变量。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#### 如何用 Swift 实现 或（||）操作</span><br><span class="line"></span><br><span class="line">**关键词**：&lt;font color=&quot;red&quot;&gt;```#autoclosure``` &lt;/font&gt;</span><br><span class="line"></span><br><span class="line">这道题的解法很多，下面给出一种最直接的解法：</span><br></pre></td></tr></table></figure></p>
+<p>func ||(left: Bool, right: Bool) -&gt; Bool {<br>    if left {<br>        return true<br>    } else {<br>        return right<br>    }<br>}<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">上面这种解法虽然正确，当时并不高效。或（||）操作的本质是，当表达式左边的值为真的时候，无需计算表达式右边的值。而上面这种解法是将表达式右边的值准备好，在传入进行操作。当表达式右边的值十分复杂时，就会造成性能上的浪费。所以，上面的这种做法违反了或（||）操作的本质，正确的实现方法如下：</span><br></pre></td></tr></table></figure></p>
+<p>func ||(left: Bool, right: @autoclosure () -&gt; Bool) -&gt; Bool {<br>    if left {<br>        return true<br>    } else {<br>        return right()<br>    }<br>}<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">autoclosure 可以将表达式右边值得计算推迟到判定 left 值为 false 时，这样就可以避免第一种方法带来的不必要的计算开销了。</span><br><span class="line"></span><br><span class="line">#### 实现一个函数：输入任意一个整数，输出为输入的整数 +2</span><br><span class="line"></span><br><span class="line">**关键词**：&lt;font color=&quot;red&quot;&gt;```#柯里化``` &lt;/font&gt;</span><br><span class="line"></span><br><span class="line">这道题看似简单，如果直接写成下面的代码：</span><br></pre></td></tr></table></figure></p>
+<p>func addTwo(_ num: Int) -&gt; Int {<br>    return num + 2<br>}<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">接下来面试官会问：“假如要实现输入为输出的整数+6或+8呢？能不能只定义一次方法呢？”正确的写法是利用 Swift 的 Currying 特性：</span><br></pre></td></tr></table></figure></p>
+<p>func add(_ num: Int) -&gt; (Int) -&gt; Int {<br>    return { val in<br>        return num + val<br>    }<br>}<br>let addTwo = add(2), addFour = add(4), addTen = add(10)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">Swift 的柯里化特性是函数式编程思想的体现。它接受多个参数的方法进行变形，并用高阶函数的方式进行处理，是整个代码更加灵活。</span><br><span class="line"></span><br><span class="line">#### 实现一个函数：求 0~100（包括 0 和 100）中为偶数并且恰好是其他数字方法的数字</span><br><span class="line"></span><br><span class="line">**关键词**：&lt;font color=&quot;red&quot;&gt;```#函数式编程``` &lt;/font&gt;</span><br><span class="line"></span><br><span class="line">这套题十分简单。最简单、最粗暴的写法如下：</span><br></pre></td></tr></table></figure></p>
+<p>func evenSquereNums(from: Int, to: Int) -&gt; [Int] {<br>    var res = <a href="">Int</a><br>    for num in from … to where num % 2 == 0 {<br>        if (from … to).contains(num <em> num) {<br>            res.append(num </em> num)<br>        }<br>    }<br>    return res<br>}<br>evenSquereNums(from: 0, to: 100)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">上面代码的写法虽然正确，但是不够优雅。首先，这个方法完全可以利用泛型进行优化，同时，可以在创建 res 数组时加上 reserveCapacity，以保证其性能。其实这个题目最简单、直接的写法使用函数式编程的思想，一行代码即可解决问题：</span><br></pre></td></tr></table></figure></p>
+<p>(0 … 10).map { $0 * $0 }.filter { $0 % 2 == 0 }<br><code>`</code></p>
+<p>Swift 有函数式编程的思想。其中 flatMap，map，reduce 和 filter 是其代表的方法。本题考察了 map 和 filter 的组合使用。相比一般的 for 循环，这种写法更加简洁。</p>
+
+    </div>
+
+    
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">
+        -------------本文结束 <i class="fa fa-paw"></i> 感谢您的阅读-------------
+        </div>
+    
+</div>
+      
+        <div class="reward-container">
+  <div>我就是加这个功能好看点，没别的意思🥺</div>
+  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Hsu 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.png" alt="Hsu 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Hsu
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://yoursite.com/2019/01/16/iOS%E9%9D%A2%E8%AF%95%E5%AE%9D%E5%85%B8-%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7-Swift/" title="iOS面试宝典 开发工具-Swift">http://yoursite.com/2019/01/16/iOS面试宝典-开发工具-Swift/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/null" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/ios-面试-swift/" rel="tag"><i class="fa fa-tag"></i> ios 面试 swift</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/2019/10/26/The Swift Programming Language 重读笔记·/" rel="prev" title="The Swift Programming Language 重读笔记">
+                  The Swift Programming Language 重读笔记 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Swift"><span class="nav-number">1.</span> <span class="nav-text">1. Swift</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Swift-面试理论题"><span class="nav-number">1.1.</span> <span class="nav-text">Swift 面试理论题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#类（class）和结构体（struct）有什么区别"><span class="nav-number">1.1.1.</span> <span class="nav-text">类（class）和结构体（struct）有什么区别</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Hsu"
+    src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">Hsu</p>
+  <div class="site-description" itemprop="description">记录一些知识，记录一些生活，记录一些足迹</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/yourname" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;yourname" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:yourname@gmail.com" title="E-Mail &amp;rarr; mailto:yourname@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/yourname" title="Weibo &amp;rarr; https:&#x2F;&#x2F;weibo.com&#x2F;yourname" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.jianshu.com/u/db56e4cae85b" title="简  书 &amp;rarr; https:&#x2F;&#x2F;www.jianshu.com&#x2F;u&#x2F;db56e4cae85b" rel="noopener" target="_blank"><i class="fa fa-fw fa-stack-overflow"></i>简  书</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/null" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title">
+      <i class="fa fa-fw fa-link"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="http://baidu.com/" title="http:&#x2F;&#x2F;baidu.com" rel="noopener" target="_blank">百度</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://google.com/" title="http:&#x2F;&#x2F;google.com" rel="noopener" target="_blank">谷歌</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Hsu</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">NaNm</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">NaN:aN</span>
+</div>
+
+
+  
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?0c58a1486de42ac6cc1c59c7d98ae887"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"left","width":100,"height":200},"mobile":{"show":true},"log":false,"tagMode":false});</script></body>
+</html>
