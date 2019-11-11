@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.7.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"mac"},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="前言这篇文章专注打印一个类的方法，属性等信息。以及实践过程中遇到的问题的思考和探索。 正文分条列举说明。 方法、属性打印">
+<meta name="keywords" content="runtime">
+<meta property="og:type" content="article">
+<meta property="og:title" content="runtime：打印类属性、方法信息">
+<meta property="og:url" content="http://xxhsu.com/2019/11/11/runtime：打印类属性、方法信息/index.html">
+<meta property="og:site_name" content="风和向日葵">
+<meta property="og:description" content="前言这篇文章专注打印一个类的方法，属性等信息。以及实践过程中遇到的问题的思考和探索。 正文分条列举说明。 方法、属性打印">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-11-11T02:00:35.754Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="runtime：打印类属性、方法信息">
+<meta name="twitter:description" content="前言这篇文章专注打印一个类的方法，属性等信息。以及实践过程中遇到的问题的思考和探索。 正文分条列举说明。 方法、属性打印">
+
+<link rel="canonical" href="http://xxhsu.com/2019/11/11/runtime：打印类属性、方法信息/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>runtime：打印类属性、方法信息 | 风和向日葵</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?f3be994bce43cea26cc0e3f96fe1c107";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">风和向日葵</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">四月的博客</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">6</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">0</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">7</span></a>
+
+  </li>
+        <li class="menu-item menu-item-commonweal">
+
+    <a href="/404/" rel="section"><i class="fa fa-fw fa-heartbeat"></i>公益 404</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/xxhApril" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xxhsu.com/2019/11/11/runtime：打印类属性、方法信息/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Hsu">
+      <meta itemprop="description" content="记录一些知识，记录一些生活，记录一些足迹">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="风和向日葵">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          runtime：打印类属性、方法信息
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2019-11-11 09:59:37 / 修改时间：02:00:35" itemprop="dateCreated datePublished" datetime="2019-11-11T09:59:37Z">2019-11-11</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>11k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>10 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>这篇文章专注打印一个类的方法，属性等信息。以及实践过程中遇到的问题的思考和探索。</p>
+<h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><p>分条列举说明。</p>
+<h3 id="方法、属性打印"><a href="#方法、属性打印" class="headerlink" title="方法、属性打印"></a>方法、属性打印</h3><a id="more"></a>
+<p>测试类 <code>Person</code> 头文件定义：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">#import &lt;Foundation/Foundation.h&gt;</span><br><span class="line">#include &lt;objc/message.h&gt;</span><br><span class="line"></span><br><span class="line">NS_ASSUME_NONNULL_BEGIN</span><br><span class="line"></span><br><span class="line">@protocol HumanInfo &lt;NSObject&gt;</span><br><span class="line">-(void)setSomeOneCountry;</span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">@interface Person : NSObject&lt;HumanInfo&gt;</span><br><span class="line"></span><br><span class="line">/// 类属性</span><br><span class="line">@property(nonatomic, strong, class) NSString *address;</span><br><span class="line">/// 实例属性</span><br><span class="line">@property(nonatomic, strong) NSString *phone;</span><br><span class="line"></span><br><span class="line">/// 类方法</span><br><span class="line">+(NSInteger)howOldAreYou;</span><br><span class="line">/// 实例方法</span><br><span class="line">-(void)whatName:(NSString * _Nullable)name;</span><br><span class="line">-(NSString *_Nullable)fullName;</span><br><span class="line"></span><br><span class="line">// MARK:- runtime</span><br><span class="line">/// 获取协议方法</span><br><span class="line">-(void)getProtocolMethods;</span><br><span class="line">/// 属性的获取。并且动态修改属性信息</span><br><span class="line">-(void)getIvarAndChange;</span><br><span class="line">/// 获取实例方法</span><br><span class="line">-(void)getInstanceMethod;</span><br><span class="line">/// 获取类方法</span><br><span class="line">-(void)getClassMethod;</span><br><span class="line"></span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">NS_ASSUME_NONNULL_END</span><br></pre></td></tr></table></figure>
+<h4 id="获取协议方法"><a href="#获取协议方法" class="headerlink" title="获取协议方法"></a>获取协议方法</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">/// 获取协议及协议方法</span><br><span class="line">- (void)getProtocolMethods &#123;</span><br><span class="line">    unsigned int count;</span><br><span class="line">    // 获取协议列表</span><br><span class="line">    __unsafe_unretained Protocol **protocolList = class_copyProtocolList([self class], &amp;count);</span><br><span class="line">    for (unsigned int i = 0; i &lt; count; i++) &#123;</span><br><span class="line">        Protocol *pro = protocolList[i];</span><br><span class="line">        const char *protoclName = protocol_getName(pro);</span><br><span class="line">        NSLog(@&quot;协议名称：%@&quot;, [NSString stringWithUTF8String:protoclName]);</span><br><span class="line">        // 获取协议方法名</span><br><span class="line">        NSArray *names = [self methodListWithProtocol:pro];</span><br><span class="line">        for (NSString *name in names) &#123;</span><br><span class="line">            NSLog(@&quot;%@ 协议方法： %@&quot;, [NSString stringWithUTF8String:protoclName], name);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/// 获取协议方法</span><br><span class="line">-(NSArray&lt;NSString *&gt;*)methodListWithProtocol: (Protocol *)protocol &#123;</span><br><span class="line">    unsigned int count = 0;</span><br><span class="line">    NSMutableArray&lt;NSString *&gt; *methodList = @[].mutableCopy;</span><br><span class="line">    struct objc_method_description *methods = protocol_copyMethodDescriptionList(protocol, YES, YES, &amp;count);</span><br><span class="line">    for (unsigned int i = 0; i &lt; count; i++) &#123;</span><br><span class="line">        struct objc_method_description method = methods[i];</span><br><span class="line">        NSString *name = NSStringFromSelector(method.name);</span><br><span class="line">        [methodList addObject:name];</span><br><span class="line">    &#125;</span><br><span class="line">    free(methods);</span><br><span class="line">    return methodList;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/// 协议方法</span><br><span class="line">- (void)setSomeOneCountry &#123;</span><br><span class="line">    NSLog(@&quot;设置所属国家&quot;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>测试：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Person *p = [[Person alloc] init];</span><br><span class="line">[p getProtocolMethods];</span><br></pre></td></tr></table></figure>
+<p>结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">协议名称：HumanInfo</span><br><span class="line">HumanInfo 协议方法： setSomeOneCountry</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>输入 <code>protocol_</code> ，根据快捷提示，可以看到很多为协议专门准备的方法，包括添加属性、获取属性列表、方法列表等。</li>
+<li><code>__unsafe_unretained Protocol **protocolList</code> 为什么要这么定义，通过查看 <code>class_copyProtocolList</code> 方法即可： <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">OBJC_EXPORT Protocol * __unsafe_unretained _Nonnull * _Nullable </span><br><span class="line">class_copyProtocolList(Class _Nullable cls, unsigned int * _Nullable outCount)</span><br><span class="line">OBJC_AVAILABLE(10.5, 2.0, 9.0, 1.0, 2.0);</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h4 id="获取属性列表并动态更改属性值"><a href="#获取属性列表并动态更改属性值" class="headerlink" title="获取属性列表并动态更改属性值"></a>获取属性列表并动态更改属性值</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">/// 属性的获取。并且动态修改属性信息</span><br><span class="line">-(void)getIvarAndChange &#123;</span><br><span class="line">    NSLog(@&quot;修改前： %@&quot;, self.phone);</span><br><span class="line">    unsigned int count;</span><br><span class="line">    Ivar *vars = class_copyIvarList([self class], &amp;count);</span><br><span class="line">    for (unsigned int i = 0; i &lt; count; i++) &#123;</span><br><span class="line">        Ivar oneVar = vars[i];</span><br><span class="line">        // 获取名字和类型</span><br><span class="line">        const char *memberName = ivar_getName(oneVar);</span><br><span class="line">        const char *memberType = ivar_getTypeEncoding(oneVar);</span><br><span class="line">        // 一次打印属性名称和属性类型</span><br><span class="line">        NSLog(@&quot;属性信息  %s: %s&quot;, memberName, memberType);</span><br><span class="line">        </span><br><span class="line">        // 修改属性</span><br><span class="line">        if (strcmp(memberName, &quot;phone&quot;) == 0) &#123;</span><br><span class="line">            // 修改前</span><br><span class="line">            NSString *name = (NSString *)object_getIvar(self, oneVar);</span><br><span class="line">            NSLog(@&quot;开始修改手机属性  phone: %@&quot;, name);</span><br><span class="line">            // 修改后</span><br><span class="line">            object_setIvar(self, oneVar, @&quot;telphoneNumber&quot;);</span><br><span class="line">            // 修改后获取</span><br><span class="line">            NSString *newName = (NSString *)object_getIvar(self, oneVar);</span><br><span class="line">            NSLog(@&quot;修改后的手机属性  %@&quot;, newName);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    free(vars);</span><br><span class="line">    NSLog(@&quot;方法列表获取结束，修改后属性信息 phone： %@&quot;, self.phone);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>测试：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[p getIvarAndChange];</span><br></pre></td></tr></table></figure></p>
+<p>结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">2019-11-05 17:34:13.838345+0800 CateAndExt[51413:735475] 修改前： (null)</span><br><span class="line">2019-11-05 17:34:13.838493+0800 CateAndExt[51413:735475] 属性信息  phone: @&quot;NSString&quot;</span><br><span class="line">2019-11-05 17:34:13.838639+0800 CateAndExt[51413:735475] 开始修改手机属性  phone: (null)</span><br><span class="line">2019-11-05 17:34:13.838763+0800 CateAndExt[51413:735475] 修改后的手机属性  telphoneNumber</span><br><span class="line">2019-11-05 17:34:13.838888+0800 CateAndExt[51413:735475] 属性信息  _delegate: @&quot;&lt;HumanInfo&gt;&quot;</span><br><span class="line">2019-11-05 17:34:13.838994+0800 CateAndExt[51413:735475] 方法列表获取结束，修改后属性信息 phone： telphoneNumber</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>不能获取到类的类属性。</li>
+<li><p>测试时建了 <code>Person</code> 的分类并添加属性，不能获取到分类中的属性信息。</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">#import &quot;Person.h&quot;</span><br><span class="line"></span><br><span class="line">NS_ASSUME_NONNULL_BEGIN</span><br><span class="line"></span><br><span class="line">@interface Person (Man)</span><br><span class="line">@property(nonatomic, strong) NSString *nickName;</span><br><span class="line"></span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">NS_ASSUME_NONNULL_END</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>其他暂时没问题。</p>
+</li>
+</ul>
+<h4 id="获取实例方法列表"><a href="#获取实例方法列表" class="headerlink" title="获取实例方法列表"></a>获取实例方法列表</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">/// 获取实例方法</span><br><span class="line">/// 获取实例方法</span><br><span class="line">-(void)getInstanceMethod &#123;</span><br><span class="line">    unsigned int count;</span><br><span class="line">    Method *methodList = class_copyMethodList([self class], &amp;count);</span><br><span class="line">    for (unsigned int i = 0; i &lt; count; i++) &#123;</span><br><span class="line">        Method oneMethod = methodList[i];</span><br><span class="line">        // 获取方法名</span><br><span class="line">        NSString *methodName = NSStringFromSelector(method_getName(oneMethod));</span><br><span class="line">        // 获取返回类型</span><br><span class="line">        char retName[512] = &#123;&#125;;</span><br><span class="line">        method_getReturnType(oneMethod, retName, 512);</span><br><span class="line">        // 获取参数个数</span><br><span class="line">        unsigned int argCount = method_getNumberOfArguments(oneMethod);</span><br><span class="line">        // 方法指针地址</span><br><span class="line">        IMP methodImp = method_getImplementation(oneMethod);</span><br><span class="line">        NSLog(@&quot;MethodName: %@ 😎 retName: %s 😎 argCount: %u 😎 methodImp: %p&quot;,methodName, retName, argCount, methodImp);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>测试：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[p getInstanceMethod];</span><br></pre></td></tr></table></figure></p>
+<p>结果:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">2019-11-05 18:04:33.361437+0800 CateAndExt[52474:754299] MethodName: getInstanceMethod 😎 retName: v 😎 argCount: 2 😎 methodImp: 0x10ec3c100</span><br><span class="line">2019-11-05 18:04:33.361690+0800 CateAndExt[52474:754299] MethodName: methodListWithProtocol: 😎 retName: @ 😎 argCount: 3 😎 methodImp: 0x10ec3bd90</span><br><span class="line">2019-11-05 18:04:33.361835+0800 CateAndExt[52474:754299] MethodName: setSomeOneCountry 😎 retName: v 😎 argCount: 2 😎 methodImp: 0x10ec3bed0</span><br><span class="line">2019-11-05 18:04:33.361971+0800 CateAndExt[52474:754299] MethodName: whatName: 😎 retName: v 😎 argCount: 3 😎 methodImp: 0x10ec3b900</span><br><span class="line">2019-11-05 18:04:33.362098+0800 CateAndExt[52474:754299] MethodName: getProtocolMethods 😎 retName: v 😎 argCount: 2 😎 methodImp: 0x10ec3ba10</span><br><span class="line">2019-11-05 18:04:33.362222+0800 CateAndExt[52474:754299] MethodName: getIvarAndChange 😎 retName: v 😎 argCount: 2 😎 methodImp: 0x10ec3bf00</span><br><span class="line">2019-11-05 18:04:33.362369+0800 CateAndExt[52474:754299] MethodName: getClassMethod 😎 retName: v 😎 argCount: 2 😎 methodImp: 0x10ec3c2a0</span><br><span class="line">2019-11-05 18:04:33.362543+0800 CateAndExt[52474:754299] MethodName: .cxx_destruct 😎 retName: v 😎 argCount: 2 😎 methodImp: 0x10ec3c350</span><br><span class="line">2019-11-05 18:04:33.364629+0800 CateAndExt[52474:754299] MethodName: delegate 😎 retName: @ 😎 argCount: 2 😎 methodImp: 0x10ec3c310</span><br><span class="line">2019-11-05 18:04:33.364777+0800 CateAndExt[52474:754299] MethodName: setDelegate: 😎 retName: v 😎 argCount: 3 😎 methodImp: 0x10ec3c330</span><br><span class="line">2019-11-05 18:04:33.364899+0800 CateAndExt[52474:754299] MethodName: phone 😎 retName: @ 😎 argCount: 2 😎 methodImp: 0x10ec3c2b0</span><br><span class="line">2019-11-05 18:04:33.365038+0800 CateAndExt[52474:754299] MethodName: fullName 😎 retName: @ 😎 argCount: 2 😎 methodImp: 0x10ec3b960</span><br><span class="line">2019-11-05 18:04:33.365172+0800 CateAndExt[52474:754299] MethodName: nickName 😎 retName: @ 😎 argCount: 2 😎 methodImp: 0x10ec3b6a0</span><br><span class="line">2019-11-05 18:04:33.365297+0800 CateAndExt[52474:754299] MethodName: setNickName: 😎 retName: v 😎 argCount: 3 😎 methodImp: 0x10ec3b6d0</span><br><span class="line">2019-11-05 18:04:33.365419+0800 CateAndExt[52474:754299] MethodName: setPhone: 😎 retName: v 😎 argCount: 3 😎 methodImp: 0x10ec3c2d0</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>该方法不能获取到类方法。</li>
+<li>方法列表包括属性的 <code>setter</code> 和 <code>getter</code> 方法。</li>
+<li>尽管该方法写在 <code>Person</code> 中，但是获取到了分类中的方法列表。</li>
+<li>方法返回类型 <code>@</code> 、 <code>v</code> 分表代表什么意思，为什么参数个数会比看到的多了两个，参考文章 <a href="https://www.jianshu.com/p/9d744a6e011f" target="_blank" rel="noopener">runtime Method精讲</a>。</li>
+</ul>
+<h4 id="获取类方法"><a href="#获取类方法" class="headerlink" title="获取类方法"></a>获取类方法</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">/// 获取类方法</span><br><span class="line">-(void)getClassMethod &#123;</span><br><span class="line">    unsigned int count;</span><br><span class="line">    Class metaclass = object_getClass([self class]);</span><br><span class="line">    Method *methodList = class_copyMethodList(metaclass, &amp;count);</span><br><span class="line">    for (unsigned int i = 0; i &lt; count; i++) &#123;</span><br><span class="line">        Method oneMethod = methodList[i];</span><br><span class="line">        // 获取方法名</span><br><span class="line">        NSString *methodName = NSStringFromSelector(method_getName(oneMethod));</span><br><span class="line">        // 获取返回类型</span><br><span class="line">        char retName[512] = &#123;&#125;;</span><br><span class="line">        method_getReturnType(oneMethod, retName, 512);</span><br><span class="line">        // 获取参数个数</span><br><span class="line">        unsigned int argCount = method_getNumberOfArguments(oneMethod);</span><br><span class="line">        // 方法指针地址</span><br><span class="line">        IMP methodImp = method_getImplementation(oneMethod);</span><br><span class="line">        NSLog(@&quot;类方法MethodName: %@ 🧐 retName: %s 🧐 argCount: %u 🧐 methodImp: %p&quot;,methodName, retName, argCount, methodImp);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>修改分类：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">#import &quot;Person.h&quot;</span><br><span class="line"></span><br><span class="line">NS_ASSUME_NONNULL_BEGIN</span><br><span class="line"></span><br><span class="line">@interface Person (Man)</span><br><span class="line">@property(nonatomic, strong) NSString *nickName;</span><br><span class="line"></span><br><span class="line">+(NSInteger)howOldAreYou;</span><br><span class="line">+(NSInteger)howOldAreYouoneMore;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">NS_ASSUME_NONNULL_END</span><br></pre></td></tr></table></figure></p>
+<p>测试：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[p getClassMethod];</span><br></pre></td></tr></table></figure>
+<p> 结果：<br> <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">2019-11-05 18:34:19.045761+0800 CateAndExt[53499:774413] 类方法MethodName: howOldAreYou 🧐 retName: q 🧐 argCount: 2 🧐 methodImp: 0x10204e3b0</span><br><span class="line">2019-11-05 18:34:19.045947+0800 CateAndExt[53499:774413] 类方法MethodName: howOldAreYou 🧐 retName: q 🧐 argCount: 2 🧐 methodImp: 0x10204e5c0</span><br><span class="line">2019-11-05 18:34:19.047406+0800 CateAndExt[53499:774413] 类方法MethodName: howOldAreYouoneMore 🧐 retName: q 🧐 argCount: 2 🧐 methodImp: 0x10204e3d0</span><br><span class="line">2019-11-05 18:34:19.047614+0800 CateAndExt[53499:774413] 类方法MethodName: address 🧐 retName: @ 🧐 argCount: 2 🧐 methodImp: 0x10204e660</span><br><span class="line">2019-11-05 18:34:19.048768+0800 CateAndExt[53499:774413] 类方法MethodName: setAddress: 🧐 retName: v 🧐 argCount: 3 🧐 methodImp: 0x10204e680</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>仅仅能获取类方法，获取不到实例方法。</li>
+<li>类方法、以及类属性，都能获取到。</li>
+<li>分类中的类方法也能获取到。分类写了和主类完全一致的方法时，两个方法同时存在。调用重复的方法时，优先调用子类方法。当然，可以通过runtime强制调用主类方法，这里不在讨论。</li>
+<li>通过方法指针可确定，分配和主类重复的方法时实质上是两个不同的方法。</li>
+</ul>
+<p>由此联想，是否可以通过 <code>Class metaclass = object_getClass([self class]);</code> 获取类属性。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">/// 获取类属性</span><br><span class="line">-(void)getClassIvar &#123;</span><br><span class="line">    unsigned int count;</span><br><span class="line">    Class metaclass = object_getClass([self class]);</span><br><span class="line">    objc_property_t *properties = class_copyPropertyList(metaclass, &amp;count);</span><br><span class="line">    for (unsigned int i = 0; i &lt; count; i++) &#123;</span><br><span class="line">        objc_property_t oneP = properties[i];</span><br><span class="line">        // 获取名字和类型</span><br><span class="line">        const char *memberName = property_getName(oneP);</span><br><span class="line">        // 一次打印属性名称和属性类型</span><br><span class="line">        NSLog(@&quot;类属性信息  %s&quot;, memberName);</span><br><span class="line">    &#125;</span><br><span class="line">    free(properties);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>打印结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">2019-11-05 18:34:19.050084+0800 CateAndExt[53499:774413] 类属性信息  address</span><br></pre></td></tr></table></figure>
+<ul>
+<li>使用 <code>class_copyIvarList</code> 不能获取到类方法，但是使用 <code>class_copyPropertyList</code> 则可以。引发另一个问题：<code>class_copyIvarList</code>  和  <code>class_copyPropertyList</code> 有什么区别。</li>
+</ul>
+<p>以下引用自 <a href="https://blog.csdn.net/east5683/article/details/45875713" target="_blank" rel="noopener">class_copyPropertyList与class_copyIvarList区别</a>:</p>
+<blockquote>
+<p>class_copyPropertyList返回的仅仅是对象类的属性(@property申明的属性)，而class_copyIvarList返回类的所有属性和变量(包括在@interface大括号中声明的变量)。</p>
+</blockquote>
+<p>原作者是写的测试函数，我在项目中直接测试，和文中结果不太一样。</p>
+<p>为 <code>Person</code> 添加属性<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">@interface Person : NSObject&lt;HumanInfo&gt;</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">    NSInteger height;</span><br><span class="line">    NSString *workName;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/// 类属性</span><br><span class="line">@property(nonatomic, strong, class) NSString *address;</span><br><span class="line">/// 实例属性</span><br><span class="line">@property(nonatomic, strong) NSString *phone;</span><br><span class="line">@property(nonatomic, assign) id &lt;HumanInfo&gt; delegate;</span><br></pre></td></tr></table></figure></p>
+<p>添加一个新的属性打印方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">/// 另一个获取属性的方法</span><br><span class="line">-(void)getProperties &#123;</span><br><span class="line">    unsigned int count;</span><br><span class="line">    unsigned int pCount;</span><br><span class="line">    Ivar *vars = class_copyIvarList([self class], &amp;count);</span><br><span class="line">    objc_property_t *properties = class_copyPropertyList([self class], &amp;pCount);</span><br><span class="line">    </span><br><span class="line">    for (unsigned int i = 0; i &lt; count; i++) &#123;</span><br><span class="line">        Ivar oneVar = vars[i];</span><br><span class="line">        // 获取名字和类型</span><br><span class="line">        const char *memberName = ivar_getName(oneVar);</span><br><span class="line">        // 一次打印属性名称和属性类型</span><br><span class="line">        NSLog(@&quot;class_copyIvarList 属性  %s&quot;, memberName);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    for (unsigned int i = 0; i &lt; pCount; i++) &#123;</span><br><span class="line">        objc_property_t oneP = properties[i];</span><br><span class="line">        // 获取名字和类型</span><br><span class="line">        const char *memberName = property_getName(oneP);</span><br><span class="line">        // 一次打印属性名称和属性类型</span><br><span class="line">        NSLog(@&quot;class_copyPropertyList 属性  %s&quot;, memberName);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    free(vars);</span><br><span class="line">    free(properties);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>打印结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">2019-11-05 18:51:52.544776+0800 CateAndExt[54040:784325] class_copyIvarList 属性  height</span><br><span class="line">2019-11-05 18:51:52.545474+0800 CateAndExt[54040:784325] class_copyIvarList 属性  workName</span><br><span class="line">2019-11-05 18:51:52.546048+0800 CateAndExt[54040:784325] class_copyIvarList 属性  phone</span><br><span class="line">2019-11-05 18:51:52.546394+0800 CateAndExt[54040:784325] class_copyIvarList 属性  _delegate</span><br><span class="line">2019-11-05 18:51:52.546694+0800 CateAndExt[54040:784325] class_copyPropertyList 属性  nickName</span><br><span class="line">2019-11-05 18:51:52.547136+0800 CateAndExt[54040:784325] class_copyPropertyList 属性  phone</span><br><span class="line">2019-11-05 18:51:52.547538+0800 CateAndExt[54040:784325] class_copyPropertyList 属性  delegate</span><br><span class="line">2019-11-05 18:51:52.547878+0800 CateAndExt[54040:784325] class_copyPropertyList 属性  hash</span><br><span class="line">2019-11-05 18:51:52.548443+0800 CateAndExt[54040:784325] class_copyPropertyList 属性  superclass</span><br><span class="line">2019-11-05 18:51:52.549367+0800 CateAndExt[54040:784325] class_copyPropertyList 属性  description</span><br><span class="line">2019-11-05 18:51:52.549822+0800 CateAndExt[54040:784325] class_copyPropertyList 属性  debugDescription</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li><code>class_copyIvarList</code> 只能找到当前类的所有属性，包括 <code>@property</code> 修饰的以及大括号修饰的变量。</li>
+<li><code>class_copyPropertyList</code> 对于当前类只能打印 <code>@property</code> 修饰的属性，但是，还能找到父类、分类中的属性。</li>
+<li>饰的以及大括号修饰的变量。即当前类所有的属性。</li>
+<li><code>class_copyPropertyList</code>  能找到类属性。 </li>
+</ul>
+<h3 id="Method-分析"><a href="#Method-分析" class="headerlink" title="Method 分析"></a><code>Method</code> 分析</h3><p>由于内容较多且独立，所以拆分出一篇单独的文章分享。</p>
+<p><a href="">runtime <code>Method</code>、<code>Ivar</code>、<code>Category</code>、<code>objc_property_t</code> 分析</a></p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>虽然这些仅仅是 <code>runtime</code> 的冰山一角，但是关于方法、属性的查询、打印应该做了比较详细的分析，后续关于此类的问题，也会在这里补全。</p>
+<p>参考文章：</p>
+<p><a href="https://blog.csdn.net/east5683/article/details/45875713" target="_blank" rel="noopener">class_copyPropertyList与class_copyIvarList区别</a></p>
+<p><a href="https://www.jianshu.com/p/1d9c47b28f77" target="_blank" rel="noopener">iOS 获取类的属性,实例方法,类方法等</a></p>
+
+    </div>
+
+    
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">
+        -------------本文结束 <i class="fa fa-paw"></i> 感谢您的阅读-------------
+        </div>
+    
+</div>
+      
+        <div class="reward-container">
+  <div>我就是加这个功能好看点，没别的意思🥺</div>
+  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Hsu 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.png" alt="Hsu 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Hsu
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://xxhsu.com/2019/11/11/runtime%EF%BC%9A%E6%89%93%E5%8D%B0%E7%B1%BB%E5%B1%9E%E6%80%A7%E3%80%81%E6%96%B9%E6%B3%95%E4%BF%A1%E6%81%AF/" title="runtime：打印类属性、方法信息">http://xxhsu.com/2019/11/11/runtime：打印类属性、方法信息/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/null" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/runtime/" rel="tag"><i class="fa fa-tag"></i> runtime</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/2019/11/11/源码阅读CTMediator/" rel="next" title="源码阅读CTMediator">
+                  <i class="fa fa-chevron-left"></i> 源码阅读CTMediator
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#正文"><span class="nav-number">2.</span> <span class="nav-text">正文</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#方法、属性打印"><span class="nav-number">2.1.</span> <span class="nav-text">方法、属性打印</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#获取协议方法"><span class="nav-number">2.1.1.</span> <span class="nav-text">获取协议方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#获取属性列表并动态更改属性值"><span class="nav-number">2.1.2.</span> <span class="nav-text">获取属性列表并动态更改属性值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#获取实例方法列表"><span class="nav-number">2.1.3.</span> <span class="nav-text">获取实例方法列表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#获取类方法"><span class="nav-number">2.1.4.</span> <span class="nav-text">获取类方法</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Method-分析"><span class="nav-number">2.2.</span> <span class="nav-text">Method 分析</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后记"><span class="nav-number">3.</span> <span class="nav-text">后记</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Hsu"
+    src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">Hsu</p>
+  <div class="site-description" itemprop="description">记录一些知识，记录一些生活，记录一些足迹</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/yourname" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;yourname" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:yourname@gmail.com" title="E-Mail &amp;rarr; mailto:yourname@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/yourname" title="Weibo &amp;rarr; https:&#x2F;&#x2F;weibo.com&#x2F;yourname" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.jianshu.com/u/db56e4cae85b" title="简  书 &amp;rarr; https:&#x2F;&#x2F;www.jianshu.com&#x2F;u&#x2F;db56e4cae85b" rel="noopener" target="_blank"><i class="fa fa-fw fa-stack-overflow"></i>简  书</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/null" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title">
+      <i class="fa fa-fw fa-link"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="http://baidu.com/" title="http:&#x2F;&#x2F;baidu.com" rel="noopener" target="_blank">百度</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://google.com/" title="http:&#x2F;&#x2F;google.com" rel="noopener" target="_blank">谷歌</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Hsu</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">56k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">51 分钟</span>
+</div>
+
+
+  
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?0c58a1486de42ac6cc1c59c7d98ae887"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"left","width":100,"height":200},"mobile":{"show":true},"log":false,"tagMode":false});</script></body>
+</html>

@@ -1,6 +1,407 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>runtime：打印类属性、方法信息</title>
+    <url>/2019/11/11/runtime%EF%BC%9A%E6%89%93%E5%8D%B0%E7%B1%BB%E5%B1%9E%E6%80%A7%E3%80%81%E6%96%B9%E6%B3%95%E4%BF%A1%E6%81%AF/</url>
+    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>这篇文章专注打印一个类的方法，属性等信息。以及实践过程中遇到的问题的思考和探索。</p>
+<h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><p>分条列举说明。</p>
+<h3 id="方法、属性打印"><a href="#方法、属性打印" class="headerlink" title="方法、属性打印"></a>方法、属性打印</h3><a id="more"></a>
+<p>测试类 <code>Person</code> 头文件定义：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#import &lt;Foundation/Foundation.h&gt;</span><br><span class="line">#include &lt;objc/message.h&gt;</span><br><span class="line"></span><br><span class="line">NS_ASSUME_NONNULL_BEGIN</span><br><span class="line"></span><br><span class="line">@protocol HumanInfo &lt;NSObject&gt;</span><br><span class="line">-(void)setSomeOneCountry;</span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">@interface Person : NSObject&lt;HumanInfo&gt;</span><br><span class="line"></span><br><span class="line">/// 类属性</span><br><span class="line">@property(nonatomic, strong, class) NSString *address;</span><br><span class="line">/// 实例属性</span><br><span class="line">@property(nonatomic, strong) NSString *phone;</span><br><span class="line"></span><br><span class="line">/// 类方法</span><br><span class="line">+(NSInteger)howOldAreYou;</span><br><span class="line">/// 实例方法</span><br><span class="line">-(void)whatName:(NSString * _Nullable)name;</span><br><span class="line">-(NSString *_Nullable)fullName;</span><br><span class="line"></span><br><span class="line">// MARK:- runtime</span><br><span class="line">/// 获取协议方法</span><br><span class="line">-(void)getProtocolMethods;</span><br><span class="line">/// 属性的获取。并且动态修改属性信息</span><br><span class="line">-(void)getIvarAndChange;</span><br><span class="line">/// 获取实例方法</span><br><span class="line">-(void)getInstanceMethod;</span><br><span class="line">/// 获取类方法</span><br><span class="line">-(void)getClassMethod;</span><br><span class="line"></span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">NS_ASSUME_NONNULL_END</span><br></pre></td></tr></table></figure>
+<h4 id="获取协议方法"><a href="#获取协议方法" class="headerlink" title="获取协议方法"></a>获取协议方法</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">/// 获取协议及协议方法</span><br><span class="line">- (void)getProtocolMethods &#123;</span><br><span class="line">    unsigned int count;</span><br><span class="line">    // 获取协议列表</span><br><span class="line">    __unsafe_unretained Protocol **protocolList = class_copyProtocolList([self class], &amp;count);</span><br><span class="line">    for (unsigned int i = 0; i &lt; count; i++) &#123;</span><br><span class="line">        Protocol *pro = protocolList[i];</span><br><span class="line">        const char *protoclName = protocol_getName(pro);</span><br><span class="line">        NSLog(@&quot;协议名称：%@&quot;, [NSString stringWithUTF8String:protoclName]);</span><br><span class="line">        // 获取协议方法名</span><br><span class="line">        NSArray *names = [self methodListWithProtocol:pro];</span><br><span class="line">        for (NSString *name in names) &#123;</span><br><span class="line">            NSLog(@&quot;%@ 协议方法： %@&quot;, [NSString stringWithUTF8String:protoclName], name);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/// 获取协议方法</span><br><span class="line">-(NSArray&lt;NSString *&gt;*)methodListWithProtocol: (Protocol *)protocol &#123;</span><br><span class="line">    unsigned int count = 0;</span><br><span class="line">    NSMutableArray&lt;NSString *&gt; *methodList = @[].mutableCopy;</span><br><span class="line">    struct objc_method_description *methods = protocol_copyMethodDescriptionList(protocol, YES, YES, &amp;count);</span><br><span class="line">    for (unsigned int i = 0; i &lt; count; i++) &#123;</span><br><span class="line">        struct objc_method_description method = methods[i];</span><br><span class="line">        NSString *name = NSStringFromSelector(method.name);</span><br><span class="line">        [methodList addObject:name];</span><br><span class="line">    &#125;</span><br><span class="line">    free(methods);</span><br><span class="line">    return methodList;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/// 协议方法</span><br><span class="line">- (void)setSomeOneCountry &#123;</span><br><span class="line">    NSLog(@&quot;设置所属国家&quot;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>测试：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Person *p = [[Person alloc] init];</span><br><span class="line">[p getProtocolMethods];</span><br></pre></td></tr></table></figure>
+<p>结果：<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">协议名称：HumanInfo</span><br><span class="line">HumanInfo 协议方法： setSomeOneCountry</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>输入 <code>protocol_</code> ，根据快捷提示，可以看到很多为协议专门准备的方法，包括添加属性、获取属性列表、方法列表等。</li>
+<li><code>__unsafe_unretained Protocol **protocolList</code> 为什么要这么定义，通过查看 <code>class_copyProtocolList</code> 方法即可： <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">OBJC_EXPORT Protocol * __unsafe_unretained _Nonnull * _Nullable </span><br><span class="line">class_copyProtocolList(Class _Nullable cls, unsigned int * _Nullable outCount)</span><br><span class="line">OBJC_AVAILABLE(10.5, 2.0, 9.0, 1.0, 2.0);</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h4 id="获取属性列表并动态更改属性值"><a href="#获取属性列表并动态更改属性值" class="headerlink" title="获取属性列表并动态更改属性值"></a>获取属性列表并动态更改属性值</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">/// 属性的获取。并且动态修改属性信息</span><br><span class="line">-(void)getIvarAndChange &#123;</span><br><span class="line">    NSLog(@&quot;修改前： %@&quot;, self.phone);</span><br><span class="line">    unsigned int count;</span><br><span class="line">    Ivar *vars = class_copyIvarList([self class], &amp;count);</span><br><span class="line">    for (unsigned int i = 0; i &lt; count; i++) &#123;</span><br><span class="line">        Ivar oneVar = vars[i];</span><br><span class="line">        // 获取名字和类型</span><br><span class="line">        const char *memberName = ivar_getName(oneVar);</span><br><span class="line">        const char *memberType = ivar_getTypeEncoding(oneVar);</span><br><span class="line">        // 一次打印属性名称和属性类型</span><br><span class="line">        NSLog(@&quot;属性信息  %s: %s&quot;, memberName, memberType);</span><br><span class="line">        </span><br><span class="line">        // 修改属性</span><br><span class="line">        if (strcmp(memberName, &quot;phone&quot;) == 0) &#123;</span><br><span class="line">            // 修改前</span><br><span class="line">            NSString *name = (NSString *)object_getIvar(self, oneVar);</span><br><span class="line">            NSLog(@&quot;开始修改手机属性  phone: %@&quot;, name);</span><br><span class="line">            // 修改后</span><br><span class="line">            object_setIvar(self, oneVar, @&quot;telphoneNumber&quot;);</span><br><span class="line">            // 修改后获取</span><br><span class="line">            NSString *newName = (NSString *)object_getIvar(self, oneVar);</span><br><span class="line">            NSLog(@&quot;修改后的手机属性  %@&quot;, newName);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    free(vars);</span><br><span class="line">    NSLog(@&quot;方法列表获取结束，修改后属性信息 phone： %@&quot;, self.phone);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>测试：<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[p getIvarAndChange];</span><br></pre></td></tr></table></figure></p>
+<p>结果：<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">2019-11-05 17:34:13.838345+0800 CateAndExt[51413:735475] 修改前： (null)</span><br><span class="line">2019-11-05 17:34:13.838493+0800 CateAndExt[51413:735475] 属性信息  phone: @&quot;NSString&quot;</span><br><span class="line">2019-11-05 17:34:13.838639+0800 CateAndExt[51413:735475] 开始修改手机属性  phone: (null)</span><br><span class="line">2019-11-05 17:34:13.838763+0800 CateAndExt[51413:735475] 修改后的手机属性  telphoneNumber</span><br><span class="line">2019-11-05 17:34:13.838888+0800 CateAndExt[51413:735475] 属性信息  _delegate: @&quot;&lt;HumanInfo&gt;&quot;</span><br><span class="line">2019-11-05 17:34:13.838994+0800 CateAndExt[51413:735475] 方法列表获取结束，修改后属性信息 phone： telphoneNumber</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>不能获取到类的类属性。</li>
+<li><p>测试时建了 <code>Person</code> 的分类并添加属性，不能获取到分类中的属性信息。</p>
+  <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#import &quot;Person.h&quot;</span><br><span class="line"></span><br><span class="line">NS_ASSUME_NONNULL_BEGIN</span><br><span class="line"></span><br><span class="line">@interface Person (Man)</span><br><span class="line">@property(nonatomic, strong) NSString *nickName;</span><br><span class="line"></span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">NS_ASSUME_NONNULL_END</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>其他暂时没问题。</p>
+</li>
+</ul>
+<h4 id="获取实例方法列表"><a href="#获取实例方法列表" class="headerlink" title="获取实例方法列表"></a>获取实例方法列表</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">/// 获取实例方法</span><br><span class="line">/// 获取实例方法</span><br><span class="line">-(void)getInstanceMethod &#123;</span><br><span class="line">    unsigned int count;</span><br><span class="line">    Method *methodList = class_copyMethodList([self class], &amp;count);</span><br><span class="line">    for (unsigned int i = 0; i &lt; count; i++) &#123;</span><br><span class="line">        Method oneMethod = methodList[i];</span><br><span class="line">        // 获取方法名</span><br><span class="line">        NSString *methodName = NSStringFromSelector(method_getName(oneMethod));</span><br><span class="line">        // 获取返回类型</span><br><span class="line">        char retName[512] = &#123;&#125;;</span><br><span class="line">        method_getReturnType(oneMethod, retName, 512);</span><br><span class="line">        // 获取参数个数</span><br><span class="line">        unsigned int argCount = method_getNumberOfArguments(oneMethod);</span><br><span class="line">        // 方法指针地址</span><br><span class="line">        IMP methodImp = method_getImplementation(oneMethod);</span><br><span class="line">        NSLog(@&quot;MethodName: %@ 😎 retName: %s 😎 argCount: %u 😎 methodImp: %p&quot;,methodName, retName, argCount, methodImp);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>测试：<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[p getInstanceMethod];</span><br></pre></td></tr></table></figure></p>
+<p>结果:<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">2019-11-05 18:04:33.361437+0800 CateAndExt[52474:754299] MethodName: getInstanceMethod 😎 retName: v 😎 argCount: 2 😎 methodImp: 0x10ec3c100</span><br><span class="line">2019-11-05 18:04:33.361690+0800 CateAndExt[52474:754299] MethodName: methodListWithProtocol: 😎 retName: @ 😎 argCount: 3 😎 methodImp: 0x10ec3bd90</span><br><span class="line">2019-11-05 18:04:33.361835+0800 CateAndExt[52474:754299] MethodName: setSomeOneCountry 😎 retName: v 😎 argCount: 2 😎 methodImp: 0x10ec3bed0</span><br><span class="line">2019-11-05 18:04:33.361971+0800 CateAndExt[52474:754299] MethodName: whatName: 😎 retName: v 😎 argCount: 3 😎 methodImp: 0x10ec3b900</span><br><span class="line">2019-11-05 18:04:33.362098+0800 CateAndExt[52474:754299] MethodName: getProtocolMethods 😎 retName: v 😎 argCount: 2 😎 methodImp: 0x10ec3ba10</span><br><span class="line">2019-11-05 18:04:33.362222+0800 CateAndExt[52474:754299] MethodName: getIvarAndChange 😎 retName: v 😎 argCount: 2 😎 methodImp: 0x10ec3bf00</span><br><span class="line">2019-11-05 18:04:33.362369+0800 CateAndExt[52474:754299] MethodName: getClassMethod 😎 retName: v 😎 argCount: 2 😎 methodImp: 0x10ec3c2a0</span><br><span class="line">2019-11-05 18:04:33.362543+0800 CateAndExt[52474:754299] MethodName: .cxx_destruct 😎 retName: v 😎 argCount: 2 😎 methodImp: 0x10ec3c350</span><br><span class="line">2019-11-05 18:04:33.364629+0800 CateAndExt[52474:754299] MethodName: delegate 😎 retName: @ 😎 argCount: 2 😎 methodImp: 0x10ec3c310</span><br><span class="line">2019-11-05 18:04:33.364777+0800 CateAndExt[52474:754299] MethodName: setDelegate: 😎 retName: v 😎 argCount: 3 😎 methodImp: 0x10ec3c330</span><br><span class="line">2019-11-05 18:04:33.364899+0800 CateAndExt[52474:754299] MethodName: phone 😎 retName: @ 😎 argCount: 2 😎 methodImp: 0x10ec3c2b0</span><br><span class="line">2019-11-05 18:04:33.365038+0800 CateAndExt[52474:754299] MethodName: fullName 😎 retName: @ 😎 argCount: 2 😎 methodImp: 0x10ec3b960</span><br><span class="line">2019-11-05 18:04:33.365172+0800 CateAndExt[52474:754299] MethodName: nickName 😎 retName: @ 😎 argCount: 2 😎 methodImp: 0x10ec3b6a0</span><br><span class="line">2019-11-05 18:04:33.365297+0800 CateAndExt[52474:754299] MethodName: setNickName: 😎 retName: v 😎 argCount: 3 😎 methodImp: 0x10ec3b6d0</span><br><span class="line">2019-11-05 18:04:33.365419+0800 CateAndExt[52474:754299] MethodName: setPhone: 😎 retName: v 😎 argCount: 3 😎 methodImp: 0x10ec3c2d0</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>该方法不能获取到类方法。</li>
+<li>方法列表包括属性的 <code>setter</code> 和 <code>getter</code> 方法。</li>
+<li>尽管该方法写在 <code>Person</code> 中，但是获取到了分类中的方法列表。</li>
+<li>方法返回类型 <code>@</code> 、 <code>v</code> 分表代表什么意思，为什么参数个数会比看到的多了两个，参考文章 <a href="https://www.jianshu.com/p/9d744a6e011f" target="_blank" rel="noopener">runtime Method精讲</a>。</li>
+</ul>
+<h4 id="获取类方法"><a href="#获取类方法" class="headerlink" title="获取类方法"></a>获取类方法</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">/// 获取类方法</span><br><span class="line">-(void)getClassMethod &#123;</span><br><span class="line">    unsigned int count;</span><br><span class="line">    Class metaclass = object_getClass([self class]);</span><br><span class="line">    Method *methodList = class_copyMethodList(metaclass, &amp;count);</span><br><span class="line">    for (unsigned int i = 0; i &lt; count; i++) &#123;</span><br><span class="line">        Method oneMethod = methodList[i];</span><br><span class="line">        // 获取方法名</span><br><span class="line">        NSString *methodName = NSStringFromSelector(method_getName(oneMethod));</span><br><span class="line">        // 获取返回类型</span><br><span class="line">        char retName[512] = &#123;&#125;;</span><br><span class="line">        method_getReturnType(oneMethod, retName, 512);</span><br><span class="line">        // 获取参数个数</span><br><span class="line">        unsigned int argCount = method_getNumberOfArguments(oneMethod);</span><br><span class="line">        // 方法指针地址</span><br><span class="line">        IMP methodImp = method_getImplementation(oneMethod);</span><br><span class="line">        NSLog(@&quot;类方法MethodName: %@ 🧐 retName: %s 🧐 argCount: %u 🧐 methodImp: %p&quot;,methodName, retName, argCount, methodImp);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>修改分类：<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#import &quot;Person.h&quot;</span><br><span class="line"></span><br><span class="line">NS_ASSUME_NONNULL_BEGIN</span><br><span class="line"></span><br><span class="line">@interface Person (Man)</span><br><span class="line">@property(nonatomic, strong) NSString *nickName;</span><br><span class="line"></span><br><span class="line">+(NSInteger)howOldAreYou;</span><br><span class="line">+(NSInteger)howOldAreYouoneMore;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">NS_ASSUME_NONNULL_END</span><br></pre></td></tr></table></figure></p>
+<p>测试：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[p getClassMethod];</span><br></pre></td></tr></table></figure>
+<p> 结果：<br> <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">2019-11-05 18:34:19.045761+0800 CateAndExt[53499:774413] 类方法MethodName: howOldAreYou 🧐 retName: q 🧐 argCount: 2 🧐 methodImp: 0x10204e3b0</span><br><span class="line">2019-11-05 18:34:19.045947+0800 CateAndExt[53499:774413] 类方法MethodName: howOldAreYou 🧐 retName: q 🧐 argCount: 2 🧐 methodImp: 0x10204e5c0</span><br><span class="line">2019-11-05 18:34:19.047406+0800 CateAndExt[53499:774413] 类方法MethodName: howOldAreYouoneMore 🧐 retName: q 🧐 argCount: 2 🧐 methodImp: 0x10204e3d0</span><br><span class="line">2019-11-05 18:34:19.047614+0800 CateAndExt[53499:774413] 类方法MethodName: address 🧐 retName: @ 🧐 argCount: 2 🧐 methodImp: 0x10204e660</span><br><span class="line">2019-11-05 18:34:19.048768+0800 CateAndExt[53499:774413] 类方法MethodName: setAddress: 🧐 retName: v 🧐 argCount: 3 🧐 methodImp: 0x10204e680</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>仅仅能获取类方法，获取不到实例方法。</li>
+<li>类方法、以及类属性，都能获取到。</li>
+<li>分类中的类方法也能获取到。分类写了和主类完全一致的方法时，两个方法同时存在。调用重复的方法时，优先调用子类方法。当然，可以通过runtime强制调用主类方法，这里不在讨论。</li>
+<li>通过方法指针可确定，分配和主类重复的方法时实质上是两个不同的方法。</li>
+</ul>
+<p>由此联想，是否可以通过 <code>Class metaclass = object_getClass([self class]);</code> 获取类属性。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">/// 获取类属性</span><br><span class="line">-(void)getClassIvar &#123;</span><br><span class="line">    unsigned int count;</span><br><span class="line">    Class metaclass = object_getClass([self class]);</span><br><span class="line">    objc_property_t *properties = class_copyPropertyList(metaclass, &amp;count);</span><br><span class="line">    for (unsigned int i = 0; i &lt; count; i++) &#123;</span><br><span class="line">        objc_property_t oneP = properties[i];</span><br><span class="line">        // 获取名字和类型</span><br><span class="line">        const char *memberName = property_getName(oneP);</span><br><span class="line">        // 一次打印属性名称和属性类型</span><br><span class="line">        NSLog(@&quot;类属性信息  %s&quot;, memberName);</span><br><span class="line">    &#125;</span><br><span class="line">    free(properties);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>打印结果：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">2019-11-05 18:34:19.050084+0800 CateAndExt[53499:774413] 类属性信息  address</span><br></pre></td></tr></table></figure>
+<ul>
+<li>使用 <code>class_copyIvarList</code> 不能获取到类方法，但是使用 <code>class_copyPropertyList</code> 则可以。引发另一个问题：<code>class_copyIvarList</code>  和  <code>class_copyPropertyList</code> 有什么区别。</li>
+</ul>
+<p>以下引用自 <a href="https://blog.csdn.net/east5683/article/details/45875713" target="_blank" rel="noopener">class_copyPropertyList与class_copyIvarList区别</a>:</p>
+<blockquote>
+<p>class_copyPropertyList返回的仅仅是对象类的属性(@property申明的属性)，而class_copyIvarList返回类的所有属性和变量(包括在@interface大括号中声明的变量)。</p>
+</blockquote>
+<p>原作者是写的测试函数，我在项目中直接测试，和文中结果不太一样。</p>
+<p>为 <code>Person</code> 添加属性<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@interface Person : NSObject&lt;HumanInfo&gt;</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">    NSInteger height;</span><br><span class="line">    NSString *workName;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/// 类属性</span><br><span class="line">@property(nonatomic, strong, class) NSString *address;</span><br><span class="line">/// 实例属性</span><br><span class="line">@property(nonatomic, strong) NSString *phone;</span><br><span class="line">@property(nonatomic, assign) id &lt;HumanInfo&gt; delegate;</span><br></pre></td></tr></table></figure></p>
+<p>添加一个新的属性打印方法：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">/// 另一个获取属性的方法</span><br><span class="line">-(void)getProperties &#123;</span><br><span class="line">    unsigned int count;</span><br><span class="line">    unsigned int pCount;</span><br><span class="line">    Ivar *vars = class_copyIvarList([self class], &amp;count);</span><br><span class="line">    objc_property_t *properties = class_copyPropertyList([self class], &amp;pCount);</span><br><span class="line">    </span><br><span class="line">    for (unsigned int i = 0; i &lt; count; i++) &#123;</span><br><span class="line">        Ivar oneVar = vars[i];</span><br><span class="line">        // 获取名字和类型</span><br><span class="line">        const char *memberName = ivar_getName(oneVar);</span><br><span class="line">        // 一次打印属性名称和属性类型</span><br><span class="line">        NSLog(@&quot;class_copyIvarList 属性  %s&quot;, memberName);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    for (unsigned int i = 0; i &lt; pCount; i++) &#123;</span><br><span class="line">        objc_property_t oneP = properties[i];</span><br><span class="line">        // 获取名字和类型</span><br><span class="line">        const char *memberName = property_getName(oneP);</span><br><span class="line">        // 一次打印属性名称和属性类型</span><br><span class="line">        NSLog(@&quot;class_copyPropertyList 属性  %s&quot;, memberName);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    free(vars);</span><br><span class="line">    free(properties);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>打印结果：<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">2019-11-05 18:51:52.544776+0800 CateAndExt[54040:784325] class_copyIvarList 属性  height</span><br><span class="line">2019-11-05 18:51:52.545474+0800 CateAndExt[54040:784325] class_copyIvarList 属性  workName</span><br><span class="line">2019-11-05 18:51:52.546048+0800 CateAndExt[54040:784325] class_copyIvarList 属性  phone</span><br><span class="line">2019-11-05 18:51:52.546394+0800 CateAndExt[54040:784325] class_copyIvarList 属性  _delegate</span><br><span class="line">2019-11-05 18:51:52.546694+0800 CateAndExt[54040:784325] class_copyPropertyList 属性  nickName</span><br><span class="line">2019-11-05 18:51:52.547136+0800 CateAndExt[54040:784325] class_copyPropertyList 属性  phone</span><br><span class="line">2019-11-05 18:51:52.547538+0800 CateAndExt[54040:784325] class_copyPropertyList 属性  delegate</span><br><span class="line">2019-11-05 18:51:52.547878+0800 CateAndExt[54040:784325] class_copyPropertyList 属性  hash</span><br><span class="line">2019-11-05 18:51:52.548443+0800 CateAndExt[54040:784325] class_copyPropertyList 属性  superclass</span><br><span class="line">2019-11-05 18:51:52.549367+0800 CateAndExt[54040:784325] class_copyPropertyList 属性  description</span><br><span class="line">2019-11-05 18:51:52.549822+0800 CateAndExt[54040:784325] class_copyPropertyList 属性  debugDescription</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li><code>class_copyIvarList</code> 只能找到当前类的所有属性，包括 <code>@property</code> 修饰的以及大括号修饰的变量。</li>
+<li><code>class_copyPropertyList</code> 对于当前类只能打印 <code>@property</code> 修饰的属性，但是，还能找到父类、分类中的属性。</li>
+<li>饰的以及大括号修饰的变量。即当前类所有的属性。</li>
+<li><code>class_copyPropertyList</code>  能找到类属性。 </li>
+</ul>
+<h3 id="Method-分析"><a href="#Method-分析" class="headerlink" title="Method 分析"></a><code>Method</code> 分析</h3><p>由于内容较多且独立，所以拆分出一篇单独的文章分享。</p>
+<p><a href="">runtime <code>Method</code>、<code>Ivar</code>、<code>Category</code>、<code>objc_property_t</code> 分析</a></p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>虽然这些仅仅是 <code>runtime</code> 的冰山一角，但是关于方法、属性的查询、打印应该做了比较详细的分析，后续关于此类的问题，也会在这里补全。</p>
+<p>参考文章：</p>
+<p><a href="https://blog.csdn.net/east5683/article/details/45875713" target="_blank" rel="noopener">class_copyPropertyList与class_copyIvarList区别</a></p>
+<p><a href="https://www.jianshu.com/p/1d9c47b28f77" target="_blank" rel="noopener">iOS 获取类的属性,实例方法,类方法等</a></p>
+]]></content>
+      <tags>
+        <tag>runtime</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>源码阅读CTMediator</title>
+    <url>/2019/11/11/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BBCTMediator/</url>
+    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今年项目进行组件化时做了一些技术调研，关于路由最终决定在 <code>Target-Action</code> 和 <code>协议代理</code> 两个方案中选择。因为项目采用 <code>Swift</code> 语言开发，并且 <code>Swift4.0</code> 之后支持了协议扩展，所以选用了后者。具体参考的是 <a href="https://github.com/Vegetarians/Lotusoot.git" target="_blank" rel="noopener">灵活的 Swift 组件解耦和通信工具Lotusoot</a>。之后也会对这个的源码在细读一遍。</p>
+<a id="more"></a>
+<p>因为近期回归 <code>Objective-C</code>，所以这里再阅读一次 <a href="https://github.com/casatwy/CTMediator" target="_blank" rel="noopener">CTMediator</a> 的源码实现。</p>
+<p>参考文章：</p>
+<p><a href="https://casatwy.com/iOS-Modulization.html" target="_blank" rel="noopener">iOS应用架构谈 组件化方案</a></p>
+<p>这里只是提供了组件化思路文章的入口，作者 <code>casatwy</code> 这系列的几篇文章，每篇都值得细读多遍。</p>
+<h2 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h2><p>因为 <code>CTMediator</code> 非常的精简，更主要的是代表了一种思路，很多非常细节的点或者业务相关紧密的，都没在源码中处理，但是大都提出了一些建议入口。所以这里会对所有代码进行展示分析。</p>
+<h3 id="对外公开方法"><a href="#对外公开方法" class="headerlink" title="对外公开方法"></a>对外公开方法</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#import &lt;UIKit/UIKit.h&gt;</span><br><span class="line"></span><br><span class="line">extern NSString * const kCTMediatorParamsKeySwiftTargetModuleName;</span><br><span class="line"></span><br><span class="line">@interface CTMediator : NSObject</span><br><span class="line"></span><br><span class="line">+ (instancetype)sharedInstance;</span><br><span class="line"></span><br><span class="line">// 远程App调用入口</span><br><span class="line">- (id)performActionWithUrl:(NSURL *)url completion:(void(^)(NSDictionary *info))completion;</span><br><span class="line">// 本地组件调用入口</span><br><span class="line">- (id)performTarget:(NSString *)targetName action:(NSString *)actionName params:(NSDictionary *)params shouldCacheTarget:(BOOL)shouldCacheTarget;</span><br><span class="line">- (void)releaseCachedTargetWithTargetName:(NSString *)targetName;</span><br><span class="line"></span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+<h3 id="获取单例对象"><a href="#获取单例对象" class="headerlink" title="获取单例对象"></a>获取单例对象</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#pragma mark - public methods</span><br><span class="line">+ (instancetype)sharedInstance</span><br><span class="line">&#123;</span><br><span class="line">    static CTMediator *mediator;</span><br><span class="line">    static dispatch_once_t onceToken;</span><br><span class="line">    dispatch_once(&amp;onceToken, ^&#123;</span><br><span class="line">        mediator = [[CTMediator alloc] init];</span><br><span class="line">    &#125;);</span><br><span class="line">    return mediator;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里并没有对 <code>alloc</code> 、<code>allocWithZone</code> 等方法补充，只是作为规定，使用 <code>CTMediator</code> 必须使用该单例。关于单例的实现，<code>Swift</code> 语言真的是精简安全太多:<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">class CTMediator &#123;</span><br><span class="line">    // 单例实现</span><br><span class="line">    static let shared = CTMediator()</span><br><span class="line">    private init() &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="远程调用入口"><a href="#远程调用入口" class="headerlink" title="远程调用入口"></a>远程调用入口</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">// 远程App调用入口</span><br><span class="line">- (id)performActionWithUrl:(NSURL *)url completion:(void(^)(NSDictionary *info))completion;</span><br></pre></td></tr></table></figure>
+<p>远程调用时，是对约定格式的 <code>URL</code> 进行解析，解析完成后，依然执行的是本地组件的调用入口：<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">/*</span><br><span class="line"> scheme://[target]/[action]?[params]</span><br><span class="line"> </span><br><span class="line"> url sample:</span><br><span class="line"> aaa://targetA/actionB?id=1234</span><br><span class="line"> */</span><br><span class="line"></span><br><span class="line">- (id)performActionWithUrl:(NSURL *)url completion:(void (^)(NSDictionary *))completion</span><br><span class="line">&#123;</span><br><span class="line">    NSMutableDictionary *params = [[NSMutableDictionary alloc] init];</span><br><span class="line">    NSString *urlString = [url query];</span><br><span class="line">    for (NSString *param in [urlString componentsSeparatedByString:@&quot;&amp;&quot;]) &#123;</span><br><span class="line">        NSArray *elts = [param componentsSeparatedByString:@&quot;=&quot;];</span><br><span class="line">        if([elts count] &lt; 2) continue;</span><br><span class="line">        [params setObject:[elts lastObject] forKey:[elts firstObject]];</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    // 这里这么写主要是出于安全考虑，防止黑客通过远程方式调用本地模块。这里的做法足以应对绝大多数场景，如果要求更加严苛，也可以做更加复杂的安全逻辑。</span><br><span class="line">    NSString *actionName = [url.path stringByReplacingOccurrencesOfString:@&quot;/&quot; withString:@&quot;&quot;];</span><br><span class="line">    if ([actionName hasPrefix:@&quot;native&quot;]) &#123;</span><br><span class="line">        return @(NO);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    // 这个demo针对URL的路由处理非常简单，就只是取对应的target名字和method名字，但这已经足以应对绝大部份需求。如果需要拓展，可以在这个方法调用之前加入完整的路由逻辑</span><br><span class="line">    id result = [self performTarget:url.host action:actionName params:params shouldCacheTarget:NO];</span><br><span class="line">    if (completion) &#123;</span><br><span class="line">        if (result) &#123;</span><br><span class="line">            completion(@&#123;@&quot;result&quot;:result&#125;);</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            completion(nil);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="本地组件调用入口"><a href="#本地组件调用入口" class="headerlink" title="本地组件调用入口"></a>本地组件调用入口</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">/// 本地组件调用入口</span><br><span class="line">/// @param targetName 模块的方法所属类名</span><br><span class="line">/// @param actionName 方法名</span><br><span class="line">/// @param params 携带参数</span><br><span class="line">/// @param shouldCacheTarget 是否缓存该模块</span><br><span class="line">- (id)performTarget:(NSString *)targetName action:(NSString *)actionName params:(NSDictionary *)params shouldCacheTarget:(BOOL)shouldCacheTarget;</span><br></pre></td></tr></table></figure>
+<p>这个就是该组件化方案的核心方法了。通过传入的模块的方法所属类名、方法名，去对应的模块代码中寻找匹配项。正是使用了反射机制、<code>runtime</code> 等特性，所以才能够彻底分离各个功能业务模块间的相互依赖。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">- (id)performTarget:(NSString *)targetName action:(NSString *)actionName params:(NSDictionary *)params shouldCacheTarget:(BOOL)shouldCacheTarget</span><br><span class="line">&#123;</span><br><span class="line">    NSString *swiftModuleName = params[kCTMediatorParamsKeySwiftTargetModuleName];</span><br><span class="line">    </span><br><span class="line">    // generate target</span><br><span class="line">    NSString *targetClassString = nil;</span><br><span class="line">    if (swiftModuleName.length &gt; 0) &#123;</span><br><span class="line">        targetClassString = [NSString stringWithFormat:@&quot;%@.Target_%@&quot;, swiftModuleName, targetName];</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        targetClassString = [NSString stringWithFormat:@&quot;Target_%@&quot;, targetName];</span><br><span class="line">    &#125;</span><br><span class="line">    // 先从缓存字典中查找</span><br><span class="line">    NSObject *target = self.cachedTarget[targetClassString];</span><br><span class="line">    if (target == nil) &#123;</span><br><span class="line">        Class targetClass = NSClassFromString(targetClassString);</span><br><span class="line">        target = [[targetClass alloc] init];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // generate action</span><br><span class="line">    NSString *actionString = [NSString stringWithFormat:@&quot;Action_%@:&quot;, actionName];</span><br><span class="line">    SEL action = NSSelectorFromString(actionString);</span><br><span class="line">    </span><br><span class="line">    if (target == nil) &#123;</span><br><span class="line">        // 这里是处理无响应请求的地方之一，这个demo做得比较简单，如果没有可以响应的target，就直接return了。实际开发过程中是可以事先给一个固定的target专门用于在这个时候顶上，然后处理这种请求的</span><br><span class="line">        [self NoTargetActionResponseWithTargetString:targetClassString selectorString:actionString originParams:params];</span><br><span class="line">        return nil;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    if (shouldCacheTarget) &#123;</span><br><span class="line">        self.cachedTarget[targetClassString] = target;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    if ([target respondsToSelector:action]) &#123;</span><br><span class="line">        return [self safePerformAction:action target:target params:params];</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        // 这里是处理无响应请求的地方，如果无响应，则尝试调用对应target的notFound方法统一处理</span><br><span class="line">        SEL action = NSSelectorFromString(@&quot;notFound:&quot;);</span><br><span class="line">        if ([target respondsToSelector:action]) &#123;</span><br><span class="line">            return [self safePerformAction:action target:target params:params];</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            // 这里也是处理无响应请求的地方，在notFound都没有的时候，这个demo是直接return了。实际开发过程中，可以用前面提到的固定的target顶上的。</span><br><span class="line">            [self NoTargetActionResponseWithTargetString:targetClassString selectorString:actionString originParams:params];</span><br><span class="line">            [self.cachedTarget removeObjectForKey:targetClassString];</span><br><span class="line">            return nil;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>针对这个方法实现，有几点要说的：</p>
+<ul>
+<li>组件的模块名是有约定规范的。对于 <code>Swift</code> ，<code>ModuleTargetName.Target_ActionName</code> 。对于 <code>Objective-C</code>，<code>Target_ActionName</code>，如果需要针对自己项目特殊化定制，则需要修改这里。</li>
+<li>关于模块缓存字典 <code>@property (nonatomic, strong) NSMutableDictionary *cachedTarget;</code>，如果模块过于复杂，并且数量多，这里会造成内存上的压力，不过对于中小型项目，应该没问题。个人认为，如果把储存的 <code>Target</code> ，改为 <code>String</code> 类型的 <code>TargetName</code>，用的时候再转换，应该会好些。标记一下，这里是一个可优化的点。</li>
+<li>方法中，<code>target == nil</code> 、 <code>![target respondsToSelector:action]</code> 、 <code>![target respondsToSelector:action]</code> 都是我们需要根据业务或者产品需求来自定义的地方。</li>
+</ul>
+<h3 id="清除缓存字典数据"><a href="#清除缓存字典数据" class="headerlink" title="清除缓存字典数据"></a>清除缓存字典数据</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">- (void)releaseCachedTargetWithTargetName:(NSString *)targetName;</span><br></pre></td></tr></table></figure>
+<p>其实就是从字典中把对应的模块移除掉：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">- (void)releaseCachedTargetWithTargetName:(NSString *)targetName</span><br><span class="line">&#123;</span><br><span class="line">    NSString *targetClassString = [NSString stringWithFormat:@&quot;Target_%@&quot;, targetName];</span><br><span class="line">    [self.cachedTarget removeObjectForKey:targetClassString];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="私有方法-private-methods"><a href="#私有方法-private-methods" class="headerlink" title="私有方法 private methods"></a>私有方法 <code>private methods</code></h3><h4 id="没有-Target"><a href="#没有-Target" class="headerlink" title="没有 Target"></a>没有 <code>Target</code></h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">/// 没有找到对应的模块实现类</span><br><span class="line">/// @param targetString Target</span><br><span class="line">/// @param selectorString 方法名</span><br><span class="line">/// @param originParams 参数</span><br><span class="line">- (void)NoTargetActionResponseWithTargetString:(NSString *)targetString selectorString:(NSString *)selectorString originParams:(NSDictionary *)originParams</span><br><span class="line">&#123;</span><br><span class="line">    SEL action = NSSelectorFromString(@&quot;Action_response:&quot;);</span><br><span class="line">    NSObject *target = [[NSClassFromString(@&quot;Target_NoTargetAction&quot;) alloc] init];</span><br><span class="line">    </span><br><span class="line">    NSMutableDictionary *params = [[NSMutableDictionary alloc] init];</span><br><span class="line">    params[@&quot;originParams&quot;] = originParams;</span><br><span class="line">    params[@&quot;targetString&quot;] = targetString;</span><br><span class="line">    params[@&quot;selectorString&quot;] = selectorString;</span><br><span class="line">    </span><br><span class="line">    [self safePerformAction:action target:target params:params];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们要根据自己的业务和产品需求，自定义自己的响应错误页面和方法。这里可以做个性化设置。</p>
+<h4 id="安全实现"><a href="#安全实现" class="headerlink" title="安全实现"></a>安全实现</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">- (id)safePerformAction:(SEL)action target:(NSObject *)target params:(NSDictionary *)params</span><br><span class="line">&#123;</span><br><span class="line">    NSMethodSignature* methodSig = [target methodSignatureForSelector:action];</span><br><span class="line">    if(methodSig == nil) &#123;</span><br><span class="line">        return nil;</span><br><span class="line">    &#125;</span><br><span class="line">    const char* retType = [methodSig methodReturnType];</span><br><span class="line"></span><br><span class="line">    if (strcmp(retType, @encode(void)) == 0) &#123;</span><br><span class="line">        NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:methodSig];</span><br><span class="line">        [invocation setArgument:&amp;params atIndex:2];</span><br><span class="line">        [invocation setSelector:action];</span><br><span class="line">        [invocation setTarget:target];</span><br><span class="line">        [invocation invoke];</span><br><span class="line">        return nil;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    if (strcmp(retType, @encode(NSInteger)) == 0) &#123;</span><br><span class="line">        NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:methodSig];</span><br><span class="line">        [invocation setArgument:&amp;params atIndex:2];</span><br><span class="line">        [invocation setSelector:action];</span><br><span class="line">        [invocation setTarget:target];</span><br><span class="line">        [invocation invoke];</span><br><span class="line">        NSInteger result = 0;</span><br><span class="line">        [invocation getReturnValue:&amp;result];</span><br><span class="line">        return @(result);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    if (strcmp(retType, @encode(BOOL)) == 0) &#123;</span><br><span class="line">        NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:methodSig];</span><br><span class="line">        [invocation setArgument:&amp;params atIndex:2];</span><br><span class="line">        [invocation setSelector:action];</span><br><span class="line">        [invocation setTarget:target];</span><br><span class="line">        [invocation invoke];</span><br><span class="line">        BOOL result = 0;</span><br><span class="line">        [invocation getReturnValue:&amp;result];</span><br><span class="line">        return @(result);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    if (strcmp(retType, @encode(CGFloat)) == 0) &#123;</span><br><span class="line">        NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:methodSig];</span><br><span class="line">        [invocation setArgument:&amp;params atIndex:2];</span><br><span class="line">        [invocation setSelector:action];</span><br><span class="line">        [invocation setTarget:target];</span><br><span class="line">        [invocation invoke];</span><br><span class="line">        CGFloat result = 0;</span><br><span class="line">        [invocation getReturnValue:&amp;result];</span><br><span class="line">        return @(result);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    if (strcmp(retType, @encode(NSUInteger)) == 0) &#123;</span><br><span class="line">        NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:methodSig];</span><br><span class="line">        [invocation setArgument:&amp;params atIndex:2];</span><br><span class="line">        [invocation setSelector:action];</span><br><span class="line">        [invocation setTarget:target];</span><br><span class="line">        [invocation invoke];</span><br><span class="line">        NSUInteger result = 0;</span><br><span class="line">        [invocation getReturnValue:&amp;result];</span><br><span class="line">        return @(result);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">#pragma clang diagnostic push</span><br><span class="line">#pragma clang diagnostic ignored &quot;-Warc-performSelector-leaks&quot;</span><br><span class="line">    return [target performSelector:action withObject:params];</span><br><span class="line">#pragma clang diagnostic pop</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>简单来说，就是对于基础数据类型，拿出来安全处理后再返回，防止数据解析错误。</p>
+<p>这个方法里，<code>NSMethodSignature</code> 、 <code>NSInvocation</code> 需要特殊说明。这里推荐一篇文章吧 <a href="https://blog.csdn.net/zww1984774346/article/details/78676361" target="_blank" rel="noopener">NSMethodSignature、NSInvocation进行消息转发</a>。</p>
+<h4 id="多说一点"><a href="#多说一点" class="headerlink" title="多说一点"></a>多说一点</h4><p><code>NSMethodSignature</code> 的头文件实现：<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#import &lt;Foundation/NSObject.h&gt;</span><br><span class="line"></span><br><span class="line">NS_ASSUME_NONNULL_BEGIN</span><br><span class="line"></span><br><span class="line">NS_SWIFT_UNAVAILABLE(&quot;NSInvocation and related APIs not available&quot;)</span><br><span class="line">@interface NSMethodSignature : NSObject</span><br><span class="line"></span><br><span class="line">+ (nullable NSMethodSignature *)signatureWithObjCTypes:(const char *)types;</span><br><span class="line"></span><br><span class="line">@property (readonly) NSUInteger numberOfArguments;</span><br><span class="line">- (const char *)getArgumentTypeAtIndex:(NSUInteger)idx NS_RETURNS_INNER_POINTER;</span><br><span class="line"></span><br><span class="line">@property (readonly) NSUInteger frameLength;</span><br><span class="line"></span><br><span class="line">- (BOOL)isOneway;</span><br><span class="line"></span><br><span class="line">@property (readonly) const char *methodReturnType NS_RETURNS_INNER_POINTER;</span><br><span class="line">@property (readonly) NSUInteger methodReturnLength;</span><br><span class="line"></span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">NS_ASSUME_NONNULL_END</span><br></pre></td></tr></table></figure></p>
+<p><code>NSInvocation</code> 的头文件实现：<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#import &lt;Foundation/NSObject.h&gt;</span><br><span class="line">#include &lt;stdbool.h&gt;</span><br><span class="line"></span><br><span class="line">@class NSMethodSignature;</span><br><span class="line"></span><br><span class="line">NS_ASSUME_NONNULL_BEGIN</span><br><span class="line"></span><br><span class="line">NS_SWIFT_UNAVAILABLE(&quot;NSInvocation and related APIs not available&quot;)</span><br><span class="line">@interface NSInvocation : NSObject</span><br><span class="line"></span><br><span class="line">+ (NSInvocation *)invocationWithMethodSignature:(NSMethodSignature *)sig;</span><br><span class="line"></span><br><span class="line">@property (readonly, retain) NSMethodSignature *methodSignature;</span><br><span class="line"></span><br><span class="line">- (void)retainArguments;</span><br><span class="line">@property (readonly) BOOL argumentsRetained;</span><br><span class="line"></span><br><span class="line">@property (nullable, assign) id target;</span><br><span class="line">@property SEL selector;</span><br><span class="line"></span><br><span class="line">- (void)getReturnValue:(void *)retLoc;</span><br><span class="line">- (void)setReturnValue:(void *)retLoc;</span><br><span class="line"></span><br><span class="line">- (void)getArgument:(void *)argumentLocation atIndex:(NSInteger)idx;</span><br><span class="line">- (void)setArgument:(void *)argumentLocation atIndex:(NSInteger)idx;</span><br><span class="line"></span><br><span class="line">- (void)invoke;</span><br><span class="line">- (void)invokeWithTarget:(id)target;</span><br><span class="line"></span><br><span class="line">@end</span><br></pre></td></tr></table></figure></p>
+<p>其实可以看到 <code>NS_SWIFT_UNAVAILABLE</code>。这些特性在 <code>Swift</code> 中都被抛弃了。我之前尝试用 <code>Swift</code> 重写 <code>CTMediator</code> 然后放到项目中使用，因为发现很多特性不能使用了，也就作罢了。不过作者也详细说明了如何在 <code>Swift</code> 项目中使用该框架： <a href="https://casatwy.com/CTMediator_in_Swift.html" target="_blank" rel="noopener">CTMediator的Swift应用</a>。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>学以致用，有些源码虽然非常精简，但是却包含了非常多值得思考的之事。譬如 <code>SwiftyJson</code> 仅仅凭借单个文件，千余行代码，就在 <code>github</code> 获取上万 <code>star</code>。 <code>CTMediator</code> 亦是如此。有些源码包罗万象，如 <code>SDWebImage</code> 等，也是学习的绝佳材料。</p>
+]]></content>
+      <tags>
+        <tag>CTMediator,源码阅读</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>iOS内存管理分析</title>
+    <url>/2019/11/11/iOS%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E5%88%86%E6%9E%90/</url>
+    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>本篇博客手动 <code>copy</code> 自 <a href="https://www.jianshu.com/p/48665652e4e4" target="_blank" rel="noopener">iOS 开发：彻底理解 iOS 内存管理（MRC、ARC）</a>。谢谢原作者的详细分析。</p>
+<h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><h4 id="一、什么是内存管理"><a href="#一、什么是内存管理" class="headerlink" title="一、什么是内存管理"></a>一、什么是内存管理</h4><a id="more"></a>
+<ul>
+<li>程序运行过程中，通常以下行为，会增加程序的内存使用：<ul>
+<li>创建一个对象</li>
+<li>定义一个变量</li>
+<li>调用一个函数或者方法</li>
+</ul>
+</li>
+<li>而一个设备的内存是有限的，程序能占用的内存也是有限的</li>
+<li>当程序所占用的内存较多时，系统就会发出内存警告，这时就得回收一些不需要的内存空间。比如回收一些不需要使用的对象、变量等</li>
+<li>如果程序占用系统内存过大，系统就可能强制关闭程序，造成程序崩溃、闪退现象，影响用户体验</li>
+</ul>
+<blockquote>
+<p>综上所述，我们要对内存进行合理的内存分配、清除内存，回收哪些不需要在使用的对象，从而保证程序的稳定性。</p>
+</blockquote>
+<p>那么，哪些对象需要我们进行内存管理呢？</p>
+<ul>
+<li>任何继承了 <code>NSObject</code> 的对象，都需要进行内存管理。</li>
+<li>而其他非对象类型，如 <code>int</code> 、 <code>char</code> 、 <code>float</code> 、 <code>double</code> 、 <code>struct</code> 、 <code>enum</code> 等，不需要进行内存管理。</li>
+</ul>
+<p>这是因为：</p>
+<ul>
+<li>继承了 <code>NSObject</code> 的对象，存储在操作系统到 <strong>堆</strong> 里边。</li>
+<li>操作系统的 <strong>堆</strong>：一般由程序员分配释放，若程序员不释放，结束时可能由系统回收，分配方式类似数据结构的链表。</li>
+<li>非 <code>OC</code> 对象一般都放在操作系统的 <strong>栈</strong> 里边。</li>
+<li>操作系统的 <strong>栈</strong>：由操作系统自动分配释放内存，存放函数的参数值、局部变量值等。其操作方式类似数据结构中的 <strong>栈（先进后出）</strong>。</li>
+</ul>
+<p>示例：<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">int main(int argc, const char *argv []) &#123;</span><br><span class="line">    @autoreleasepool &#123;</span><br><span class="line">        int a = 10;  // 栈</span><br><span class="line">        int b = 20;  // 栈</span><br><span class="line">        // p: 栈</span><br><span class="line">        // Person 对象（计数器 == 1）：堆</span><br><span class="line">        Person *p = [[Person alloc] init];</span><br><span class="line">    &#125;</span><br><span class="line">    // 经过上面代码后，栈里的变量 a、b、p 都会被回收</span><br><span class="line">    // 但是堆里的 Person 对象仍会留在内存中，因为它的计数器依然是 1</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><img src="https://i.loli.net/2019/10/22/C2Zypj5RcaDQJtv.png" alt="iOS内存管理-1"></p>
+<blockquote>
+<p>上述说法过于片面，其实并非所有 继承了 <code>NSObject</code> 的对象，存储在操作系统到 <strong>堆</strong> 里边，譬如创建的字符串有时候根据创建方式、位置，也会存储到 <strong>常量区</strong>。</p>
+</blockquote>
+<h4 id="二、内存管理模型"><a href="#二、内存管理模型" class="headerlink" title="二、内存管理模型"></a>二、内存管理模型</h4><p>提供给 <code>Objective-C</code> 程序员的内存管理模型有一下三种：</p>
+<ul>
+<li>自动垃圾收集（<code>iOS</code> 运行环境不支持）</li>
+<li>手工引用计数和自动释放池（<code>MRC</code>）</li>
+<li>自动引用计数（<code>ARC</code>）</li>
+</ul>
+<h4 id="三、-MRC-手动管理内存（Manual-Reference-Counting）"><a href="#三、-MRC-手动管理内存（Manual-Reference-Counting）" class="headerlink" title="三、 MRC 手动管理内存（Manual Reference Counting）"></a>三、 <code>MRC</code> 手动管理内存（<code>Manual Reference Counting</code>）</h4><h5 id="1-引用计数器"><a href="#1-引用计数器" class="headerlink" title="1. 引用计数器"></a>1. 引用计数器</h5><p>系统就是根据一个对象的引用计数器来判断什么时候需要回收一个对象的内存。</p>
+<ul>
+<li>引用计数器是一个整数</li>
+<li>从字面意思，可以理解为一个对象被引用的次数。也可以理解为，有多少人正在引用这个对象</li>
+<li>每个 <code>OC</code> 都有自己的引用计数器</li>
+<li>任何一个对象，创建初始的引用计数都是1</li>
+<li>当使用 <code>alloc</code> 、<code>new</code> 、<code>copy</code> 等关键词创建一个对象时，对象的引用计数默认就是1</li>
+<li>当没有任何人使用这个对象时，该对象就会被回收，也就是说：<ul>
+<li>当对象的引用计数为0时，该对象的内存地址就会被回收。</li>
+<li>如果对象的引用计数不为0，那么在整个程序运行过程，它占用的内存就不可能被回收（除非整个程序已经退出）</li>
+</ul>
+</li>
+</ul>
+<h5 id="2-引用计数操作"><a href="#2-引用计数操作" class="headerlink" title="2. 引用计数操作"></a>2. 引用计数操作</h5><ul>
+<li>为保证对象的存在，每当创建一个该对象的引用时，需要该对象发送一条 <code>retain</code> 消息，使该对象的引用计数 +1。（<code>retain</code> 方法返回对象本身）。</li>
+<li>当不再需要该对象时，通过给对象发送 <code>release</code> 消息，可使对象的引用计数器 -1。</li>
+<li>给对象发送 <code>retainCount</code> 消息，可以获得当前的引用计数器值</li>
+<li>当对象的引用计数器为 0 时，系统就知道该对象已经不被引用了，可以回收该对象的内存了。这时会主动调用对象的 <code>dealloc</code> 方法发起整个回收过程。</li>
+<li>需要注意的是，<code>release</code> 并不代表销毁或者回收队形，仅仅是引用计数器 <code>-1</code>。</li>
+</ul>
+<h5 id="3-dealloc-方法"><a href="#3-dealloc-方法" class="headerlink" title="3. dealloc 方法"></a>3. <code>dealloc</code> 方法</h5><ul>
+<li>当一个对象的引用计数为 0 时，该对象即将被销毁，内存被回收。</li>
+<li>对象即将被销毁时，系统会给对象发送一条 <code>dealloc</code> 消息，因此，也能够通过对象是否调用 <code>dealloc</code> 方法来判断是否被销毁。</li>
+<li><code>dealloc</code> 方法的重写<ul>
+<li>一般都会重写 <code>dealloc</code> 方法，在这里释放相关资源。<code>dealloc</code> 就是对象的遗言。</li>
+<li>一旦重写了 <code>dealloc</code> 方法，就必须调用 <code>dealloc</code> 方法，并且放到最后面。</li>
+</ul>
+</li>
+<li>注意，不能直接调用 <code>dealloc</code> 方法。一旦对象被回收了，其占用的内存就不能使用了，坚持使用会导致程序崩溃，即野指针错误。</li>
+</ul>
+<h5 id="4-野指针和空指针"><a href="#4-野指针和空指针" class="headerlink" title="4. 野指针和空指针"></a>4. 野指针和空指针</h5><ul>
+<li>只要一个对象被销毁了，我们就称这个对象是 <code>僵尸对象（不能再使用的对象）</code>。</li>
+<li>当一个指针指向僵尸对象（不可用内存），我们就称这个指针为野指针。</li>
+<li><p>只要给一个野指针发送消息，就会引发崩溃。（<code>EXC_BAD_ACCESS</code>）</p>
+  <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">int main(int argc, const char * argv[]) &#123;</span><br><span class="line">    @autoreleasepool &#123;</span><br><span class="line">        Person *p = [[Person alloc] init]; // 执行完引用计数为 1</span><br><span class="line">        [p release]; // 执行完引用计数为0，实例对象被释放</span><br><span class="line">        [p release]; // 此时，p就变成了野指针，再给野指针p发送消息就会报错</span><br><span class="line">        [p release];</span><br><span class="line">    &#125;</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>为了防止野指针错误，一般情况下，当一个对象被销毁时，我们就将该对象的引用指针设为 <code>空指针</code>。</p>
+</li>
+<li>空指针<ul>
+<li>没有指向内存空间的指针。里面存的是 <code>nil</code> ，也就是 <code>0</code>。</li>
+<li>给空指针发送消息是没有任何回应的。<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">int main(int argc, const char * argv[]) &#123;</span><br><span class="line">    @autoreleasepool &#123;</span><br><span class="line">        Person *p = [[Person alloc] init]; // 执行完引用计数为1</span><br><span class="line">        [p release]; // 执行完引用计数为0，实例对象被释放</span><br><span class="line">        p = nil; // 此时，p变为了空指针</span><br><span class="line">        [p release]; // 再给空指针p发送消息就不会报错了</span><br><span class="line">        [p release];</span><br><span class="line">    &#125;</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ul>
+<h5 id="5-内存管理规律"><a href="#5-内存管理规律" class="headerlink" title="5. 内存管理规律"></a>5. 内存管理规律</h5><p><code>单个对象内存管理规律</code></p>
+<ul>
+<li>谁创建，谁 <code>release</code> <ul>
+<li>如果通过 <code>alloc</code> 、 <code>new</code> 、 <code>copy</code> 、 <code>mutableCopy</code> 来创建一个对象，那么就必须调用 <code>release</code> 或者 <code>autorelase</code>。</li>
+</ul>
+</li>
+<li><p>谁 <code>retain</code> ，谁 <code>release</code></p>
+<ul>
+<li>只要调用了 <code>retain</code>，就必须调用 <code>release</code> 。</li>
+</ul>
+</li>
+<li><p>总结一下：</p>
+<ul>
+<li>有加就有减</li>
+<li>曾经让对象的引用计数 <code>+1</code> ，就必须在最后将对象的引用计数 <code>-1</code> 。</li>
+</ul>
+</li>
+</ul>
+<p><code>多个对象内存管理规律</code></p>
+<ul>
+<li>其实就是 <code>内存管理规律</code> 的多个使用。</li>
+</ul>
+<h5 id="6-property-参数"><a href="#6-property-参数" class="headerlink" title="6. @property 参数"></a>6. <code>@property</code> 参数</h5><ul>
+<li>在成员变量前加上 <code>@property</code> ，系统就会帮我们生成基本的 <code>getter/setter</code> 方法。</li>
+<li>如果在 <code>property</code> 属性用 <code>retain</code> 修饰，系统就会帮我们生成 <code>getter/setter</code> 方法的内存管理代码，但是仍需要我们自己重写 <code>dealloc</code> 代码。</li>
+<li>如果 <code>property</code> 属性用 <code>assgin</code> 修饰，系统就不会帮我们生成 <code>setter</code> 方法的内存管理代码，仅仅只会生成普通的 <code>getter/setter</code> 方法。默认什么都不写就是 <code>assgin</code> 。</li>
+</ul>
+<h5 id="7-自动释放池"><a href="#7-自动释放池" class="headerlink" title="7. 自动释放池"></a>7. 自动释放池</h5><p>当我们不在使用一个对象的时候应该将其内存释放掉。但是有时候我们不知道应该何时将其释放，为了解决这个问题， <code>Objective-C</code> 提供了 <code>autorelease</code> 方法</p>
+<ul>
+<li><code>autorelease</code> 是一种支持引用计数的内存管理方式，只要给对象发送一条 <code>autorelease</code>消息，会将对象放到一个自动释放池中，当自动释放池被销毁时，会对池子里的所有对象做一次 <code>release</code> 操作。<blockquote>
+<p>需要特别注意的是：这里只是发送 <code>release</code> 消息，如果对象的引用计数不为 0，该对象依然不会被销毁。</p>
+</blockquote>
+</li>
+<li><code>autorelease</code> 方法会返回对象自身，且调用完 <code>autorelease</code> 后，对象的计数器不变。</li>
+</ul>
+<h6 id="7-1-使用-autorelease-有什么好处呢？"><a href="#7-1-使用-autorelease-有什么好处呢？" class="headerlink" title="7.1 使用 autorelease 有什么好处呢？"></a>7.1 使用 <code>autorelease</code> 有什么好处呢？</h6><ul>
+<li>不在关心对象的释放时间</li>
+<li>不在关心什么时候调用 <code>release</code> </li>
+</ul>
+<h6 id="7-2-autorelease-的原理实质上是什么？"><a href="#7-2-autorelease-的原理实质上是什么？" class="headerlink" title="7.2 autorelease 的原理实质上是什么？"></a>7.2 <code>autorelease</code> 的原理实质上是什么？</h6><p><code>autorelease</code> 实际上只是把 <code>release</code> 的调用延迟了，对于每一个 <code>autorelease</code> ,系统只是把对象放入了当前的 <code>autorelease pool</code> 中，当该 <code>pool</code> 被释放时，该 <code>pool</code> 中所有对象都会调用 <code>release</code> 。</p>
+<h6 id="7-3-autorelease-的创建方法"><a href="#7-3-autorelease-的创建方法" class="headerlink" title="7.3 autorelease 的创建方法"></a>7.3 <code>autorelease</code> 的创建方法</h6><ul>
+<li><p>使用 <code>NSAutoreleasePool</code> 来创建：</p>
+ <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init]; // 创建自动释放池</span><br><span class="line">[pool release]; // [pool drain]; 销毁自动释放池</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>使用 <code>@autoreleasepool</code> 创建：</p>
+  <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@autoreleasepool</span><br><span class="line">&#123; //开始代表创建自动释放池</span><br><span class="line">&#125; //结束代表销毁自动释放池</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h6 id="7-4-autorelease-的使用方法"><a href="#7-4-autorelease-的使用方法" class="headerlink" title="7.4 autorelease 的使用方法"></a>7.4 <code>autorelease</code> 的使用方法</h6><ul>
+<li><p><code>NSAutoreleasePool</code> 用法：</p>
+  <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];</span><br><span class="line">Person *p = [[[Person alloc] init] autorelease];</span><br><span class="line">[autoreleasePool drain];</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>@autoreleasepool</code> 用法:</p>
+  <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@autoreleasepool</span><br><span class="line">&#123; // 创建一个自动释放池</span><br><span class="line">    Person *p = [[Person new] autorelease];</span><br><span class="line">    // 将代码写到这里就放入了自动释放池</span><br><span class="line">&#125; // 销毁自动释放池(会给池子中所有对象发送一条release消息)</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h6 id="7-5-autorelease-的注意事项"><a href="#7-5-autorelease-的注意事项" class="headerlink" title="7.5 autorelease 的注意事项"></a>7.5 <code>autorelease</code> 的注意事项</h6><ul>
+<li><p>并不是放到自动释放池代码中，就会自动加入自动释放池</p>
+  <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@autoreleasepool &#123;</span><br><span class="line">    // 因为没有调用 autorelease 方法,所以对象没有加入到自动释放池</span><br><span class="line">    Person *p = [[Person alloc] init];</span><br><span class="line">    [p run];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在自动释放池的外部调用 <code>autorelease</code> 不会被加入到自动释放池中。<code>autorelease</code> 是一个方法，只有在自动释放池中调用才有效。</p>
+  <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@autoreleasepool &#123;</span><br><span class="line">&#125;</span><br><span class="line">// 没有与之对应的自动释放池, 只有在自动释放池中调用autorelease才会放到释放池</span><br><span class="line">Person *p = [[[Person alloc] init] autorelease];</span><br><span class="line">[p run];</span><br><span class="line"></span><br><span class="line">// 正确写法</span><br><span class="line">@autoreleasepool &#123;</span><br><span class="line">    Person *p = [[[Person alloc] init] autorelease];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 正确写法</span><br><span class="line">Person *p = [[Person alloc] init];</span><br><span class="line">@autoreleasepool &#123;</span><br><span class="line">    [p autorelease];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h6 id="7-6-自动释放池的嵌套调用"><a href="#7-6-自动释放池的嵌套调用" class="headerlink" title="7.6 自动释放池的嵌套调用"></a>7.6 自动释放池的嵌套调用</h6><ul>
+<li>自动释放池是以栈的形式存在。</li>
+<li><p>由于栈只有一个入口，所以调用 <code>autorelease</code> 时会将对象放到栈顶的自动释放池。栈顶就是离调用 <code>autorelease</code> 最近的自动释放池。</p>
+  <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@autoreleasepool &#123; // 栈底自动释放池</span><br><span class="line">    @autoreleasepool &#123;</span><br><span class="line">        @autoreleasepool &#123; // 栈顶自动释放池</span><br><span class="line">            Person *p = [[[Person alloc] init] autorelease];</span><br><span class="line">        &#125;</span><br><span class="line">        Person *p = [[[Person alloc] init] autorelease];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>自动释放池内不宜放占用内存比较大的对象</p>
+<ul>
+<li>尽量避免对大内存使用该方法，对这种延迟释放机制，还是尽量少用。</li>
+<li>不要把大量循环操作放到一个 <code>autoreleasepool</code> 之间，这样会造成内存峰值的上升。<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">// 内存暴涨</span><br><span class="line">@autoreleasepool &#123;</span><br><span class="line">    for (int i = 0; i &lt; 99999; ++i) &#123;</span><br><span class="line">        Person *p = [[[Person alloc] init] autorelease];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 内存不会暴涨</span><br><span class="line">for (int i = 0; i &lt; 99999; ++i) &#123;</span><br><span class="line">    @autoreleasepool &#123;</span><br><span class="line">        Person *p = [[[Person alloc] init] autorelease];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ul>
+<h6 id="7-7-autorelease-错误用法"><a href="#7-7-autorelease-错误用法" class="headerlink" title="7.7 autorelease 错误用法"></a>7.7 <code>autorelease</code> 错误用法</h6><ul>
+<li><p>不要连续使用 <code>autorelease</code></p>
+  <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@autoreleasepool &#123;</span><br><span class="line">    // 错误写法, 过度释放</span><br><span class="line">    Person *p = [[[[Person alloc] init] autorelease] autorelease];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>调用 <code>autorelease</code> 后又调用 <code>release</code></p>
+  <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@autoreleasepool &#123;</span><br><span class="line">    Person *p = [[[Person alloc] init] autorelease];</span><br><span class="line">    [p release]; // 错误写法, 过度释放</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h5 id="8-MRC-中避免循环-retian"><a href="#8-MRC-中避免循环-retian" class="headerlink" title="8. MRC 中避免循环 retian"></a>8. <code>MRC</code> 中避免循环 <code>retian</code></h5><ul>
+<li>不要让 <code>A</code> <code>retain</code> <code>B</code>，<code>B</code> <code>retain</code> <code>A</code>。</li>
+<li>让其中一方不要做 <code>retain</code> 操作即可。</li>
+<li>当两端互相引用时，应该一端用 <code>retain</code>，一端用 <code>assign</code> 。</li>
+</ul>
+<h4 id="四、ARC-自动管理内存（Automatic-Reference-Counting）"><a href="#四、ARC-自动管理内存（Automatic-Reference-Counting）" class="headerlink" title="四、ARC 自动管理内存（Automatic Reference Counting）"></a>四、<code>ARC</code> 自动管理内存（<code>Automatic Reference Counting</code>）</h4><ul>
+<li><code>Automatic Reference Counting</code>，自动引用计数，即 <code>ARC</code>，<code>WWDC2011</code> 和 <code>iOS5</code> 所引用的最大变革和最激动人心的变化。<code>ARC</code> 是新的 <code>LLVM3.0</code>  编译器的一项特性，使用 <code>ARC</code>，可以说是一举解决了广大 <code>iOS</code> 开发者所憎恶的手动内存管理的麻烦。</li>
+<li>使用 <code>ARC</code> 后，系统会检测出何时需要保持对象，何时需要自动释放对象，何时需要释放对象，编译器会管理好对象的内存，会在合适的地方插入<code>retain</code> 、 <code>release</code> 、 <code>autorelease</code> ，通过生成正确的代码，去自动释放或者保持对象。</li>
+</ul>
+<h5 id="4-1-ARC-的判断原则"><a href="#4-1-ARC-的判断原则" class="headerlink" title="4.1 ARC 的判断原则"></a>4.1 <code>ARC</code> 的判断原则</h5><p><code>ARC</code> 通过判断对象是否被 <code>强指针</code> 引用来决定引用计数是否增加。</p>
+<ul>
+<li>强指针<ul>
+<li>默认所有对象的指针变量都是强指针</li>
+<li>被 <code>__strong</code> 修饰的指针</li>
+</ul>
+</li>
+<li>弱指针<ul>
+<li>被 <code>__weak</code> 修饰的指针<h5 id="4-2-ARC-的使用"><a href="#4-2-ARC-的使用" class="headerlink" title="4.2 ARC 的使用"></a>4.2 <code>ARC</code> 的使用</h5><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">int main(int argc, const char * argv[]) &#123;</span><br><span class="line">    // 不用写release, main函数执行完毕后p会被自动释放</span><br><span class="line">    Person *p = [[Person alloc] init];</span><br><span class="line"></span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ul>
+<h5 id="4-3-ARC-的注意点"><a href="#4-3-ARC-的注意点" class="headerlink" title="4.3 ARC 的注意点"></a>4.3 <code>ARC</code> 的注意点</h5><ul>
+<li>不允许调用对象的 <code>release</code> 方法</li>
+<li>不允许调用 <code>autorelease</code> 方法</li>
+<li>重写父类的 <code>dealloc</code> 时，不能在调用 <code>[super deallock]</code></li>
+</ul>
+<h5 id="4-4-ARC-下对象内存管理"><a href="#4-4-ARC-下对象内存管理" class="headerlink" title="4.4 ARC 下对象内存管理"></a>4.4 <code>ARC</code> 下对象内存管理</h5><ul>
+<li><p>局部变量释放，对象随之被释放</p>
+  <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">int main(int argc, const char * argv[]) &#123;</span><br><span class="line">    @autoreleasepool &#123;</span><br><span class="line">        Person *p = [[Person alloc] init];</span><br><span class="line">    &#125; // 执行到这一行局部变量p释放</span><br><span class="line">    // 由于没有强指针指向对象, 所以对象也释放</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>清空指针，对象随之被释放</p>
+  <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">int main(int argc, const char * argv[]) &#123;</span><br><span class="line">    @autoreleasepool &#123;</span><br><span class="line">        Person *p = [[Person alloc] init];</span><br><span class="line">        p = nil; // 执行到这一行, 由于没有强指针指向对象, 所以对象被释放</span><br><span class="line">    &#125;</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>默认所有指针都是强指针</p>
+  <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">int main(int argc, const char * argv[]) &#123;</span><br><span class="line">    @autoreleasepool &#123;</span><br><span class="line">        // p1和p2都是强指针</span><br><span class="line">        Person *p1 = [[Person alloc] init];</span><br><span class="line">        __strong Person *p2 = [[Person alloc] init];</span><br><span class="line">    &#125;</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>弱指针需要明确说明(注意：千万不要使用弱指针保存薪创建的对象)</p>
+  <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">int main(int argc, const char * argv[]) &#123;</span><br><span class="line">    @autoreleasepool &#123;</span><br><span class="line">        // p是弱指针, 对象会被立即释放</span><br><span class="line">        __weak Person *p1 = [[Person alloc] init];</span><br><span class="line">    &#125;</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h5 id="4-5-ARC-下多对象内存管理"><a href="#4-5-ARC-下多对象内存管理" class="headerlink" title="4.5 ARC 下多对象内存管理"></a>4.5 <code>ARC</code> 下多对象内存管理</h5><p><code>ARC</code> 和 <code>MRC</code> 一样，想拥有某个对象必须用强指针保存对象，但是不需要在 <code>dealloc</code> 中 <code>release</code>。<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@interface Person : NSObject</span><br><span class="line">// MRC写法</span><br><span class="line">//@property (nonatomic, retain) Dog *dog;</span><br><span class="line"></span><br><span class="line">// ARC写法</span><br><span class="line">@property (nonatomic, strong) Dog *dog;</span><br><span class="line">@end</span><br></pre></td></tr></table></figure></p>
+<h5 id="4-6-ARC-中的-property-参数"><a href="#4-6-ARC-中的-property-参数" class="headerlink" title="4.6 ARC 中的 @property 参数"></a>4.6 <code>ARC</code> 中的 <code>@property</code> 参数</h5><ul>
+<li><code>strong</code>: 用于 <code>OC</code> 对象，相当于 <code>MRC</code> 中的 <code>retain</code></li>
+<li><code>weak</code>: 用于 <code>OC</code> 对象，相当于 <code>MRC</code> 中的 <code>assign</code></li>
+<li><code>assign</code>: 用于基本数据类型，跟 <code>MRC</code> 中 <code>assign</code> 一样。</li>
+</ul>
+<h5 id="4-7-ARC-下循环引用问题"><a href="#4-7-ARC-下循环引用问题" class="headerlink" title="4.7 ARC 下循环引用问题"></a>4.7 <code>ARC</code> 下循环引用问题</h5><p><code>ARC</code> 跟 <code>MRC</code> 一样，如果 <code>A</code> 拥有 <code>B</code>，<code>B</code> 拥有 <code>A</code>，那么必须一方使用弱指针。<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@interface Person : NSObject</span><br><span class="line">@property (nonatomic, strong) Dog *dog;</span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">@interface Dog : NSObject</span><br><span class="line">// 错误写法, 循环引用会导致内存泄露</span><br><span class="line">//@property (nonatomic, strong) Person *owner;</span><br><span class="line"></span><br><span class="line">// 正确写法, 当如果保存对象建议使用weak</span><br><span class="line">@property (nonatomic, weak) Person *owner;</span><br><span class="line">@end</span><br></pre></td></tr></table></figure></p>
+<h3 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h3><p>最近两年一直在使用 <code>Swift</code>，对 <code>OC</code> 的一些基础知识遗忘了不少，通过这篇博客算是温习一些。接下来打算在细读一遍 《Objective-C高级编程》，来对 <code>ARC</code> 、 <code>Blocks</code> 、 <code>GCD</code> 做一个系统的复习。</p>
+]]></content>
+      <tags>
+        <tag>iOS,内存,面试</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>iOS内存分配：堆、栈、全局区、常量区、代码区</title>
+    <url>/2019/11/01/iOS%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%EF%BC%9A%E5%A0%86%E3%80%81%E6%A0%88%E3%80%81%E5%85%A8%E5%B1%80%E5%8C%BA%E3%80%81%E5%B8%B8%E9%87%8F%E5%8C%BA%E3%80%81%E4%BB%A3%E7%A0%81%E5%8C%BA/</url>
+    <content><![CDATA[<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>内容参考：</p>
+<p><a href="https://blog.csdn.net/zhw521411/article/details/89844273" target="_blank" rel="noopener">iOS 内存分配 栈、堆、全局区、常量区、代码区
+</a></p>
+<p><a href="https://www.jianshu.com/p/df630e78df32" target="_blank" rel="noopener">NSString存储管理–NSTaggedPointerString</a></p>
+<p><a href="https://www.jianshu.com/p/746c747e7e00" target="_blank" rel="noopener">iOS开发中的内存分配（堆和栈）</a></p>
+<a id="more"></a>
+<h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><p><img src="https://i.loli.net/2019/10/23/vwNbsckyQJXUg64.png" alt="iOS内存分配.png"></p>
+<h4 id="1-代码区"><a href="#1-代码区" class="headerlink" title="1. 代码区"></a>1. 代码区</h4><p>代码区是用来存放函数的二进制代码，也就是，它是可执行程序在内存中的镜像。代码段需要防止在运行时被非法修改，所以只允许读取操作，而不允许写入操作。</p>
+<h4 id="2-全局（静态）区"><a href="#2-全局（静态）区" class="headerlink" title="2. 全局（静态）区"></a>2. 全局（静态）区</h4><ul>
+<li>数据区：数据段用来存放可执行文件中已经初始化的全局变量，也就是用来存放静态分配的变量和全局变量。</li>
+<li>BSS区：BSS段包含了程序中未初始化的全局变量</li>
+</ul>
+<h4 id="3-常量区"><a href="#3-常量区" class="headerlink" title="3. 常量区"></a>3. 常量区</h4><p>常量存储区，这是一块比较特殊的存储区，他们里面存放的是常量。</p>
+<h4 id="4-堆（heap）区"><a href="#4-堆（heap）区" class="headerlink" title="4. 堆（heap）区"></a>4. 堆（heap）区</h4><p>堆是由程序员分配和释放，用于存放进程运行中被动态分配的内存段。它大小不固定，可动态扩张和缩减。</p>
+<h4 id="5-栈（stack）区"><a href="#5-栈（stack）区" class="headerlink" title="5. 栈（stack）区"></a>5. 栈（stack）区</h4><p>栈是由编译器自动分配释放来管理内存。用户存放程序临时创建的变量、存放函数的参数值、局部变量等。由于栈的先进后出特点，所以特别适合用来做保存/恢复现场的操作。从这个吧意义上，我们可以把栈看做一个临时寄存、交换的内存区。</p>
+<p>static 修饰的属性始终保存到常量区。</p>
+<blockquote>
+<p>上述几种内存区域中，数据段、BSS、堆通常都是被连续存储的-内存位置上的连续（并不是堆链式存储的内存区域）。而代码段和栈往往会被独立存放。</p>
+</blockquote>
+<blockquote>
+<p>栈是向低地址扩展的数据结构，是一块连续的内存区域。堆是向高地址扩展的数据结构，是不连续的内存区域。</p>
+</blockquote>
+<h3 id="内存模型-Heap、Stack"><a href="#内存模型-Heap、Stack" class="headerlink" title="内存模型 Heap、Stack"></a>内存模型 Heap、Stack</h3><p>以下内容引用自阮一峰老师的 <a href="http://www.ruanyifeng.com/blog/2018/01/assembly-language-primer.html" target="_blank" rel="noopener">汇编语言入门教程</a>。</p>
+<p>对于堆 <code>heap</code> 和 栈 <code>stack</code> 描述更加详细易懂。</p>
+<h4 id="1-堆-Heap"><a href="#1-堆-Heap" class="headerlink" title="1. 堆 Heap"></a>1. 堆 <code>Heap</code></h4><p>寄存器只能存放少量的数据，大多数时候， <code>CPU</code> 还要指挥寄存器，直接跟内存交换数据，所以，除了寄存器，还必须了解内存怎么存储数据。</p>
+<p>程序运行的时候，操作系统会给它分配一块内存，用来存储程序和运行产生的数据，比如从 <code>0x1000</code> 到 <code>0x8000</code>，起始地址是较小的那个地址，结束地址是较大的那个地址。</p>
+<p><img src="https://i.loli.net/2019/10/31/LTUFinQrWfgskIM.png" alt="内存示意图"></p>
+<p>程序运行过程中，对于动态的内存占用请求（比如新建对象），系统就会从预先分配好的那段内存中，划出一部分给用户，具体规则是从起始地址开始划分（实际上，起始地址会有一段静态数据，这里忽略）。举例来说，用户要求得到10个字节内存，那么从起始地址 <code>0x1000</code> 开始给他分配，一直分配到 <code>0x100A</code>，如果在要求得到 <code>22</code> 个字节，那么就分配到 <code>0x1020</code>。</p>
+<p><img src="https://i.loli.net/2019/10/31/A5F9RSraq3zZy14.png" alt="内存分配"></p>
+<p>这种因为用户主动请求而划分出来的内存区域，叫做 <code>Heap(堆)</code>。它由起始位置开始，从低位（地址）向高位（地址）增长。 <code>Heap</code> 的一个重要特点就是不会自动消失，必须手动释放，或者由垃圾回收机制来回收。</p>
+<h4 id="2-栈-Stack"><a href="#2-栈-Stack" class="headerlink" title="2. 栈 Stack"></a>2. 栈 <code>Stack</code></h4><p>除了 <code>Heap</code> 外，其他的内存占用叫做 <code>Stack(栈)</code>。简单来说，<code>Stack</code> 是由于函数运行而临时占用的内存区域。 </p>
+<p><img src="https://i.loli.net/2019/10/31/rDStKFxY2gnJQPM.png" alt="栈内存"></p>
+<p>请看下面的例子：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">int main() &#123;</span><br><span class="line">    int a = 2;</span><br><span class="line">    int b = 3;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面代码中，系统开始执行 <code>main</code> 函数时，会为它在内存里面建立一个 <code>帧（frame）</code>，所有的 <code>main</code> 的内部变量（比如 <code>a</code> 和 <code>b</code>）都保存在这个 <code>帧</code> 里面。<code>main</code> 函数执行结束后，该帧就会被回收，释放所有的内部变量，不再占用空间。</p>
+<p><img src="https://i.loli.net/2019/10/31/c1aJKyxk6AXub5G.png" alt="帧（frame）"></p>
+<p>如果函数内部调用其他函数，会发生什么情况呢？</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">int main() &#123;</span><br><span class="line">    int a = 2;</span><br><span class="line">    int b = 3;</span><br><span class="line">    return add_a_and_b(a,b);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面代码中，<code>main</code> 函数调用了 <code>add_a_and_b</code> 函数。执行到这一行的时候，系统也会为 <code>add_a_and_b</code> 新建一个 <code>帧（frame）</code>，用来存储它的内部变量。也就是说，此时同时存在两个帧：<code>main</code> 和 <code>add_a_and_b</code>。一般来说，调用栈有多少层，就有多少帧。</p>
+<p><img src="https://i.loli.net/2019/10/31/asmhyVkiEDQFNJL.png" alt="函数嵌套"></p>
+<p>等到 <code>add_a_and_b</code> 运行结束，它的帧就会被回收，系统会回到刚才 <code>main</code> 函数中断执行的地方，继续往下执行。通过这种机制，就实现了函数的层层调用，并且每一层都能使用自己的本地变量。</p>
+<p>所有的帧都存放在 <code>Stack</code> ，由于帧是一层层叠加的，所以 <code>Stack</code> 叫做 <strong>栈</strong>。生成新的帧，叫 <code>入栈</code>，英文单词是 <code>push</code>；栈的回收叫 <code>出栈</code>，英文是 <code>pop</code>。<code>Stack</code> 的特点就是，最晚入栈的帧最早出栈（因为最内层的函数调用，最先结束执行），这种叫做 <strong>后进先出</strong> 的数据结构。每一次函数执行结束，就自动释放一个帧，所有的函数执行结束，整个 <code>Stack</code> 就都释放了。</p>
+<p><code>Stack</code> 是由内存区域的结束地址开始，从高位（地址）向地位（地址）分配。比如，内存区域的结束地址是 <code>0x8000</code>，第一帧假定是 <code>16</code> 字节，那么下一次分配的地址就会从 <code>0x7FF0</code> 开始；第二帧假定需要 <code>64</code> 字节，那么地址就会移到 <code>0x7FB0</code>。</p>
+<p><img src="https://i.loli.net/2019/10/31/7h8ewTifNRcLmyr.png" alt="栈内存地址分配"></p>
+<h3 id="关于-NSString-的内存分配"><a href="#关于-NSString-的内存分配" class="headerlink" title="关于 NSString 的内存分配"></a>关于 <code>NSString</code> 的内存分配</h3><p><a href="https://www.jianshu.com/p/df630e78df32" target="_blank" rel="noopener">NSString存储管理–NSTaggedPointerString</a> 文章中详细说明了问题，我们并不能单纯的通过打印内存地址，来判断数据存储的区域在常量，或者堆区、栈区。</p>
+]]></content>
+      <tags>
+        <tag>iOS,Objective-C,内存</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>我每天打开网页都干了啥</title>
     <url>/2019/10/30/%E6%88%91%E6%AF%8F%E5%A4%A9%E6%89%93%E5%BC%80%E7%BD%91%E9%A1%B5%E9%83%BD%E5%B9%B2%E4%BA%86%E5%95%A5/</url>
     <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>除了技术相关问题，这里收集自己每天打开网页都干了啥事。没有一个具体的网页是被平白无故打开的。每个（每个？我不信。。）具体网页的目的都这里留存一份吧。</p>

@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.7.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"mac"},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="前言本篇博客手动 copy 自 iOS 开发：彻底理解 iOS 内存管理（MRC、ARC）。谢谢原作者的详细分析。 正文一、什么是内存管理">
+<meta name="keywords" content="iOS,内存,面试">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS内存管理分析">
+<meta property="og:url" content="http://xxhsu.com/2019/11/11/iOS内存管理分析/index.html">
+<meta property="og:site_name" content="风和向日葵">
+<meta property="og:description" content="前言本篇博客手动 copy 自 iOS 开发：彻底理解 iOS 内存管理（MRC、ARC）。谢谢原作者的详细分析。 正文一、什么是内存管理">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://i.loli.net/2019/10/22/C2Zypj5RcaDQJtv.png">
+<meta property="og:updated_time" content="2019-11-11T01:57:38.156Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="iOS内存管理分析">
+<meta name="twitter:description" content="前言本篇博客手动 copy 自 iOS 开发：彻底理解 iOS 内存管理（MRC、ARC）。谢谢原作者的详细分析。 正文一、什么是内存管理">
+<meta name="twitter:image" content="https://i.loli.net/2019/10/22/C2Zypj5RcaDQJtv.png">
+
+<link rel="canonical" href="http://xxhsu.com/2019/11/11/iOS内存管理分析/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>iOS内存管理分析 | 风和向日葵</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?f3be994bce43cea26cc0e3f96fe1c107";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">风和向日葵</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">四月的博客</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">6</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">0</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">7</span></a>
+
+  </li>
+        <li class="menu-item menu-item-commonweal">
+
+    <a href="/404/" rel="section"><i class="fa fa-fw fa-heartbeat"></i>公益 404</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/xxhApril" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xxhsu.com/2019/11/11/iOS内存管理分析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Hsu">
+      <meta itemprop="description" content="记录一些知识，记录一些生活，记录一些足迹">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="风和向日葵">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          iOS内存管理分析
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2019-11-11 09:56:40 / 修改时间：01:57:38" itemprop="dateCreated datePublished" datetime="2019-11-11T09:56:40Z">2019-11-11</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>7.2k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>7 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>本篇博客手动 <code>copy</code> 自 <a href="https://www.jianshu.com/p/48665652e4e4" target="_blank" rel="noopener">iOS 开发：彻底理解 iOS 内存管理（MRC、ARC）</a>。谢谢原作者的详细分析。</p>
+<h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><h4 id="一、什么是内存管理"><a href="#一、什么是内存管理" class="headerlink" title="一、什么是内存管理"></a>一、什么是内存管理</h4><a id="more"></a>
+<ul>
+<li>程序运行过程中，通常以下行为，会增加程序的内存使用：<ul>
+<li>创建一个对象</li>
+<li>定义一个变量</li>
+<li>调用一个函数或者方法</li>
+</ul>
+</li>
+<li>而一个设备的内存是有限的，程序能占用的内存也是有限的</li>
+<li>当程序所占用的内存较多时，系统就会发出内存警告，这时就得回收一些不需要的内存空间。比如回收一些不需要使用的对象、变量等</li>
+<li>如果程序占用系统内存过大，系统就可能强制关闭程序，造成程序崩溃、闪退现象，影响用户体验</li>
+</ul>
+<blockquote>
+<p>综上所述，我们要对内存进行合理的内存分配、清除内存，回收哪些不需要在使用的对象，从而保证程序的稳定性。</p>
+</blockquote>
+<p>那么，哪些对象需要我们进行内存管理呢？</p>
+<ul>
+<li>任何继承了 <code>NSObject</code> 的对象，都需要进行内存管理。</li>
+<li>而其他非对象类型，如 <code>int</code> 、 <code>char</code> 、 <code>float</code> 、 <code>double</code> 、 <code>struct</code> 、 <code>enum</code> 等，不需要进行内存管理。</li>
+</ul>
+<p>这是因为：</p>
+<ul>
+<li>继承了 <code>NSObject</code> 的对象，存储在操作系统到 <strong>堆</strong> 里边。</li>
+<li>操作系统的 <strong>堆</strong>：一般由程序员分配释放，若程序员不释放，结束时可能由系统回收，分配方式类似数据结构的链表。</li>
+<li>非 <code>OC</code> 对象一般都放在操作系统的 <strong>栈</strong> 里边。</li>
+<li>操作系统的 <strong>栈</strong>：由操作系统自动分配释放内存，存放函数的参数值、局部变量值等。其操作方式类似数据结构中的 <strong>栈（先进后出）</strong>。</li>
+</ul>
+<p>示例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">int main(int argc, const char *argv []) &#123;</span><br><span class="line">    @autoreleasepool &#123;</span><br><span class="line">        int a = 10;  // 栈</span><br><span class="line">        int b = 20;  // 栈</span><br><span class="line">        // p: 栈</span><br><span class="line">        // Person 对象（计数器 == 1）：堆</span><br><span class="line">        Person *p = [[Person alloc] init];</span><br><span class="line">    &#125;</span><br><span class="line">    // 经过上面代码后，栈里的变量 a、b、p 都会被回收</span><br><span class="line">    // 但是堆里的 Person 对象仍会留在内存中，因为它的计数器依然是 1</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><img src="https://i.loli.net/2019/10/22/C2Zypj5RcaDQJtv.png" alt="iOS内存管理-1"></p>
+<blockquote>
+<p>上述说法过于片面，其实并非所有 继承了 <code>NSObject</code> 的对象，存储在操作系统到 <strong>堆</strong> 里边，譬如创建的字符串有时候根据创建方式、位置，也会存储到 <strong>常量区</strong>。</p>
+</blockquote>
+<h4 id="二、内存管理模型"><a href="#二、内存管理模型" class="headerlink" title="二、内存管理模型"></a>二、内存管理模型</h4><p>提供给 <code>Objective-C</code> 程序员的内存管理模型有一下三种：</p>
+<ul>
+<li>自动垃圾收集（<code>iOS</code> 运行环境不支持）</li>
+<li>手工引用计数和自动释放池（<code>MRC</code>）</li>
+<li>自动引用计数（<code>ARC</code>）</li>
+</ul>
+<h4 id="三、-MRC-手动管理内存（Manual-Reference-Counting）"><a href="#三、-MRC-手动管理内存（Manual-Reference-Counting）" class="headerlink" title="三、 MRC 手动管理内存（Manual Reference Counting）"></a>三、 <code>MRC</code> 手动管理内存（<code>Manual Reference Counting</code>）</h4><h5 id="1-引用计数器"><a href="#1-引用计数器" class="headerlink" title="1. 引用计数器"></a>1. 引用计数器</h5><p>系统就是根据一个对象的引用计数器来判断什么时候需要回收一个对象的内存。</p>
+<ul>
+<li>引用计数器是一个整数</li>
+<li>从字面意思，可以理解为一个对象被引用的次数。也可以理解为，有多少人正在引用这个对象</li>
+<li>每个 <code>OC</code> 都有自己的引用计数器</li>
+<li>任何一个对象，创建初始的引用计数都是1</li>
+<li>当使用 <code>alloc</code> 、<code>new</code> 、<code>copy</code> 等关键词创建一个对象时，对象的引用计数默认就是1</li>
+<li>当没有任何人使用这个对象时，该对象就会被回收，也就是说：<ul>
+<li>当对象的引用计数为0时，该对象的内存地址就会被回收。</li>
+<li>如果对象的引用计数不为0，那么在整个程序运行过程，它占用的内存就不可能被回收（除非整个程序已经退出）</li>
+</ul>
+</li>
+</ul>
+<h5 id="2-引用计数操作"><a href="#2-引用计数操作" class="headerlink" title="2. 引用计数操作"></a>2. 引用计数操作</h5><ul>
+<li>为保证对象的存在，每当创建一个该对象的引用时，需要该对象发送一条 <code>retain</code> 消息，使该对象的引用计数 +1。（<code>retain</code> 方法返回对象本身）。</li>
+<li>当不再需要该对象时，通过给对象发送 <code>release</code> 消息，可使对象的引用计数器 -1。</li>
+<li>给对象发送 <code>retainCount</code> 消息，可以获得当前的引用计数器值</li>
+<li>当对象的引用计数器为 0 时，系统就知道该对象已经不被引用了，可以回收该对象的内存了。这时会主动调用对象的 <code>dealloc</code> 方法发起整个回收过程。</li>
+<li>需要注意的是，<code>release</code> 并不代表销毁或者回收队形，仅仅是引用计数器 <code>-1</code>。</li>
+</ul>
+<h5 id="3-dealloc-方法"><a href="#3-dealloc-方法" class="headerlink" title="3. dealloc 方法"></a>3. <code>dealloc</code> 方法</h5><ul>
+<li>当一个对象的引用计数为 0 时，该对象即将被销毁，内存被回收。</li>
+<li>对象即将被销毁时，系统会给对象发送一条 <code>dealloc</code> 消息，因此，也能够通过对象是否调用 <code>dealloc</code> 方法来判断是否被销毁。</li>
+<li><code>dealloc</code> 方法的重写<ul>
+<li>一般都会重写 <code>dealloc</code> 方法，在这里释放相关资源。<code>dealloc</code> 就是对象的遗言。</li>
+<li>一旦重写了 <code>dealloc</code> 方法，就必须调用 <code>dealloc</code> 方法，并且放到最后面。</li>
+</ul>
+</li>
+<li>注意，不能直接调用 <code>dealloc</code> 方法。一旦对象被回收了，其占用的内存就不能使用了，坚持使用会导致程序崩溃，即野指针错误。</li>
+</ul>
+<h5 id="4-野指针和空指针"><a href="#4-野指针和空指针" class="headerlink" title="4. 野指针和空指针"></a>4. 野指针和空指针</h5><ul>
+<li>只要一个对象被销毁了，我们就称这个对象是 <code>僵尸对象（不能再使用的对象）</code>。</li>
+<li>当一个指针指向僵尸对象（不可用内存），我们就称这个指针为野指针。</li>
+<li><p>只要给一个野指针发送消息，就会引发崩溃。（<code>EXC_BAD_ACCESS</code>）</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">int main(int argc, const char * argv[]) &#123;</span><br><span class="line">    @autoreleasepool &#123;</span><br><span class="line">        Person *p = [[Person alloc] init]; // 执行完引用计数为 1</span><br><span class="line">        [p release]; // 执行完引用计数为0，实例对象被释放</span><br><span class="line">        [p release]; // 此时，p就变成了野指针，再给野指针p发送消息就会报错</span><br><span class="line">        [p release];</span><br><span class="line">    &#125;</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>为了防止野指针错误，一般情况下，当一个对象被销毁时，我们就将该对象的引用指针设为 <code>空指针</code>。</p>
+</li>
+<li>空指针<ul>
+<li>没有指向内存空间的指针。里面存的是 <code>nil</code> ，也就是 <code>0</code>。</li>
+<li>给空指针发送消息是没有任何回应的。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">int main(int argc, const char * argv[]) &#123;</span><br><span class="line">    @autoreleasepool &#123;</span><br><span class="line">        Person *p = [[Person alloc] init]; // 执行完引用计数为1</span><br><span class="line">        [p release]; // 执行完引用计数为0，实例对象被释放</span><br><span class="line">        p = nil; // 此时，p变为了空指针</span><br><span class="line">        [p release]; // 再给空指针p发送消息就不会报错了</span><br><span class="line">        [p release];</span><br><span class="line">    &#125;</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ul>
+<h5 id="5-内存管理规律"><a href="#5-内存管理规律" class="headerlink" title="5. 内存管理规律"></a>5. 内存管理规律</h5><p><code>单个对象内存管理规律</code></p>
+<ul>
+<li>谁创建，谁 <code>release</code> <ul>
+<li>如果通过 <code>alloc</code> 、 <code>new</code> 、 <code>copy</code> 、 <code>mutableCopy</code> 来创建一个对象，那么就必须调用 <code>release</code> 或者 <code>autorelase</code>。</li>
+</ul>
+</li>
+<li><p>谁 <code>retain</code> ，谁 <code>release</code></p>
+<ul>
+<li>只要调用了 <code>retain</code>，就必须调用 <code>release</code> 。</li>
+</ul>
+</li>
+<li><p>总结一下：</p>
+<ul>
+<li>有加就有减</li>
+<li>曾经让对象的引用计数 <code>+1</code> ，就必须在最后将对象的引用计数 <code>-1</code> 。</li>
+</ul>
+</li>
+</ul>
+<p><code>多个对象内存管理规律</code></p>
+<ul>
+<li>其实就是 <code>内存管理规律</code> 的多个使用。</li>
+</ul>
+<h5 id="6-property-参数"><a href="#6-property-参数" class="headerlink" title="6. @property 参数"></a>6. <code>@property</code> 参数</h5><ul>
+<li>在成员变量前加上 <code>@property</code> ，系统就会帮我们生成基本的 <code>getter/setter</code> 方法。</li>
+<li>如果在 <code>property</code> 属性用 <code>retain</code> 修饰，系统就会帮我们生成 <code>getter/setter</code> 方法的内存管理代码，但是仍需要我们自己重写 <code>dealloc</code> 代码。</li>
+<li>如果 <code>property</code> 属性用 <code>assgin</code> 修饰，系统就不会帮我们生成 <code>setter</code> 方法的内存管理代码，仅仅只会生成普通的 <code>getter/setter</code> 方法。默认什么都不写就是 <code>assgin</code> 。</li>
+</ul>
+<h5 id="7-自动释放池"><a href="#7-自动释放池" class="headerlink" title="7. 自动释放池"></a>7. 自动释放池</h5><p>当我们不在使用一个对象的时候应该将其内存释放掉。但是有时候我们不知道应该何时将其释放，为了解决这个问题， <code>Objective-C</code> 提供了 <code>autorelease</code> 方法</p>
+<ul>
+<li><code>autorelease</code> 是一种支持引用计数的内存管理方式，只要给对象发送一条 <code>autorelease</code>消息，会将对象放到一个自动释放池中，当自动释放池被销毁时，会对池子里的所有对象做一次 <code>release</code> 操作。<blockquote>
+<p>需要特别注意的是：这里只是发送 <code>release</code> 消息，如果对象的引用计数不为 0，该对象依然不会被销毁。</p>
+</blockquote>
+</li>
+<li><code>autorelease</code> 方法会返回对象自身，且调用完 <code>autorelease</code> 后，对象的计数器不变。</li>
+</ul>
+<h6 id="7-1-使用-autorelease-有什么好处呢？"><a href="#7-1-使用-autorelease-有什么好处呢？" class="headerlink" title="7.1 使用 autorelease 有什么好处呢？"></a>7.1 使用 <code>autorelease</code> 有什么好处呢？</h6><ul>
+<li>不在关心对象的释放时间</li>
+<li>不在关心什么时候调用 <code>release</code> </li>
+</ul>
+<h6 id="7-2-autorelease-的原理实质上是什么？"><a href="#7-2-autorelease-的原理实质上是什么？" class="headerlink" title="7.2 autorelease 的原理实质上是什么？"></a>7.2 <code>autorelease</code> 的原理实质上是什么？</h6><p><code>autorelease</code> 实际上只是把 <code>release</code> 的调用延迟了，对于每一个 <code>autorelease</code> ,系统只是把对象放入了当前的 <code>autorelease pool</code> 中，当该 <code>pool</code> 被释放时，该 <code>pool</code> 中所有对象都会调用 <code>release</code> 。</p>
+<h6 id="7-3-autorelease-的创建方法"><a href="#7-3-autorelease-的创建方法" class="headerlink" title="7.3 autorelease 的创建方法"></a>7.3 <code>autorelease</code> 的创建方法</h6><ul>
+<li><p>使用 <code>NSAutoreleasePool</code> 来创建：</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init]; // 创建自动释放池</span><br><span class="line">[pool release]; // [pool drain]; 销毁自动释放池</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>使用 <code>@autoreleasepool</code> 创建：</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">@autoreleasepool</span><br><span class="line">&#123; //开始代表创建自动释放池</span><br><span class="line">&#125; //结束代表销毁自动释放池</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h6 id="7-4-autorelease-的使用方法"><a href="#7-4-autorelease-的使用方法" class="headerlink" title="7.4 autorelease 的使用方法"></a>7.4 <code>autorelease</code> 的使用方法</h6><ul>
+<li><p><code>NSAutoreleasePool</code> 用法：</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];</span><br><span class="line">Person *p = [[[Person alloc] init] autorelease];</span><br><span class="line">[autoreleasePool drain];</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>@autoreleasepool</code> 用法:</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">@autoreleasepool</span><br><span class="line">&#123; // 创建一个自动释放池</span><br><span class="line">    Person *p = [[Person new] autorelease];</span><br><span class="line">    // 将代码写到这里就放入了自动释放池</span><br><span class="line">&#125; // 销毁自动释放池(会给池子中所有对象发送一条release消息)</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h6 id="7-5-autorelease-的注意事项"><a href="#7-5-autorelease-的注意事项" class="headerlink" title="7.5 autorelease 的注意事项"></a>7.5 <code>autorelease</code> 的注意事项</h6><ul>
+<li><p>并不是放到自动释放池代码中，就会自动加入自动释放池</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">@autoreleasepool &#123;</span><br><span class="line">    // 因为没有调用 autorelease 方法,所以对象没有加入到自动释放池</span><br><span class="line">    Person *p = [[Person alloc] init];</span><br><span class="line">    [p run];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在自动释放池的外部调用 <code>autorelease</code> 不会被加入到自动释放池中。<code>autorelease</code> 是一个方法，只有在自动释放池中调用才有效。</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">@autoreleasepool &#123;</span><br><span class="line">&#125;</span><br><span class="line">// 没有与之对应的自动释放池, 只有在自动释放池中调用autorelease才会放到释放池</span><br><span class="line">Person *p = [[[Person alloc] init] autorelease];</span><br><span class="line">[p run];</span><br><span class="line"></span><br><span class="line">// 正确写法</span><br><span class="line">@autoreleasepool &#123;</span><br><span class="line">    Person *p = [[[Person alloc] init] autorelease];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 正确写法</span><br><span class="line">Person *p = [[Person alloc] init];</span><br><span class="line">@autoreleasepool &#123;</span><br><span class="line">    [p autorelease];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h6 id="7-6-自动释放池的嵌套调用"><a href="#7-6-自动释放池的嵌套调用" class="headerlink" title="7.6 自动释放池的嵌套调用"></a>7.6 自动释放池的嵌套调用</h6><ul>
+<li>自动释放池是以栈的形式存在。</li>
+<li><p>由于栈只有一个入口，所以调用 <code>autorelease</code> 时会将对象放到栈顶的自动释放池。栈顶就是离调用 <code>autorelease</code> 最近的自动释放池。</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">@autoreleasepool &#123; // 栈底自动释放池</span><br><span class="line">    @autoreleasepool &#123;</span><br><span class="line">        @autoreleasepool &#123; // 栈顶自动释放池</span><br><span class="line">            Person *p = [[[Person alloc] init] autorelease];</span><br><span class="line">        &#125;</span><br><span class="line">        Person *p = [[[Person alloc] init] autorelease];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>自动释放池内不宜放占用内存比较大的对象</p>
+<ul>
+<li>尽量避免对大内存使用该方法，对这种延迟释放机制，还是尽量少用。</li>
+<li>不要把大量循环操作放到一个 <code>autoreleasepool</code> 之间，这样会造成内存峰值的上升。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">// 内存暴涨</span><br><span class="line">@autoreleasepool &#123;</span><br><span class="line">    for (int i = 0; i &lt; 99999; ++i) &#123;</span><br><span class="line">        Person *p = [[[Person alloc] init] autorelease];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 内存不会暴涨</span><br><span class="line">for (int i = 0; i &lt; 99999; ++i) &#123;</span><br><span class="line">    @autoreleasepool &#123;</span><br><span class="line">        Person *p = [[[Person alloc] init] autorelease];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ul>
+<h6 id="7-7-autorelease-错误用法"><a href="#7-7-autorelease-错误用法" class="headerlink" title="7.7 autorelease 错误用法"></a>7.7 <code>autorelease</code> 错误用法</h6><ul>
+<li><p>不要连续使用 <code>autorelease</code></p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">@autoreleasepool &#123;</span><br><span class="line">    // 错误写法, 过度释放</span><br><span class="line">    Person *p = [[[[Person alloc] init] autorelease] autorelease];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>调用 <code>autorelease</code> 后又调用 <code>release</code></p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">@autoreleasepool &#123;</span><br><span class="line">    Person *p = [[[Person alloc] init] autorelease];</span><br><span class="line">    [p release]; // 错误写法, 过度释放</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h5 id="8-MRC-中避免循环-retian"><a href="#8-MRC-中避免循环-retian" class="headerlink" title="8. MRC 中避免循环 retian"></a>8. <code>MRC</code> 中避免循环 <code>retian</code></h5><ul>
+<li>不要让 <code>A</code> <code>retain</code> <code>B</code>，<code>B</code> <code>retain</code> <code>A</code>。</li>
+<li>让其中一方不要做 <code>retain</code> 操作即可。</li>
+<li>当两端互相引用时，应该一端用 <code>retain</code>，一端用 <code>assign</code> 。</li>
+</ul>
+<h4 id="四、ARC-自动管理内存（Automatic-Reference-Counting）"><a href="#四、ARC-自动管理内存（Automatic-Reference-Counting）" class="headerlink" title="四、ARC 自动管理内存（Automatic Reference Counting）"></a>四、<code>ARC</code> 自动管理内存（<code>Automatic Reference Counting</code>）</h4><ul>
+<li><code>Automatic Reference Counting</code>，自动引用计数，即 <code>ARC</code>，<code>WWDC2011</code> 和 <code>iOS5</code> 所引用的最大变革和最激动人心的变化。<code>ARC</code> 是新的 <code>LLVM3.0</code>  编译器的一项特性，使用 <code>ARC</code>，可以说是一举解决了广大 <code>iOS</code> 开发者所憎恶的手动内存管理的麻烦。</li>
+<li>使用 <code>ARC</code> 后，系统会检测出何时需要保持对象，何时需要自动释放对象，何时需要释放对象，编译器会管理好对象的内存，会在合适的地方插入<code>retain</code> 、 <code>release</code> 、 <code>autorelease</code> ，通过生成正确的代码，去自动释放或者保持对象。</li>
+</ul>
+<h5 id="4-1-ARC-的判断原则"><a href="#4-1-ARC-的判断原则" class="headerlink" title="4.1 ARC 的判断原则"></a>4.1 <code>ARC</code> 的判断原则</h5><p><code>ARC</code> 通过判断对象是否被 <code>强指针</code> 引用来决定引用计数是否增加。</p>
+<ul>
+<li>强指针<ul>
+<li>默认所有对象的指针变量都是强指针</li>
+<li>被 <code>__strong</code> 修饰的指针</li>
+</ul>
+</li>
+<li>弱指针<ul>
+<li>被 <code>__weak</code> 修饰的指针<h5 id="4-2-ARC-的使用"><a href="#4-2-ARC-的使用" class="headerlink" title="4.2 ARC 的使用"></a>4.2 <code>ARC</code> 的使用</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">int main(int argc, const char * argv[]) &#123;</span><br><span class="line">    // 不用写release, main函数执行完毕后p会被自动释放</span><br><span class="line">    Person *p = [[Person alloc] init];</span><br><span class="line"></span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ul>
+<h5 id="4-3-ARC-的注意点"><a href="#4-3-ARC-的注意点" class="headerlink" title="4.3 ARC 的注意点"></a>4.3 <code>ARC</code> 的注意点</h5><ul>
+<li>不允许调用对象的 <code>release</code> 方法</li>
+<li>不允许调用 <code>autorelease</code> 方法</li>
+<li>重写父类的 <code>dealloc</code> 时，不能在调用 <code>[super deallock]</code></li>
+</ul>
+<h5 id="4-4-ARC-下对象内存管理"><a href="#4-4-ARC-下对象内存管理" class="headerlink" title="4.4 ARC 下对象内存管理"></a>4.4 <code>ARC</code> 下对象内存管理</h5><ul>
+<li><p>局部变量释放，对象随之被释放</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">int main(int argc, const char * argv[]) &#123;</span><br><span class="line">    @autoreleasepool &#123;</span><br><span class="line">        Person *p = [[Person alloc] init];</span><br><span class="line">    &#125; // 执行到这一行局部变量p释放</span><br><span class="line">    // 由于没有强指针指向对象, 所以对象也释放</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>清空指针，对象随之被释放</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">int main(int argc, const char * argv[]) &#123;</span><br><span class="line">    @autoreleasepool &#123;</span><br><span class="line">        Person *p = [[Person alloc] init];</span><br><span class="line">        p = nil; // 执行到这一行, 由于没有强指针指向对象, 所以对象被释放</span><br><span class="line">    &#125;</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>默认所有指针都是强指针</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">int main(int argc, const char * argv[]) &#123;</span><br><span class="line">    @autoreleasepool &#123;</span><br><span class="line">        // p1和p2都是强指针</span><br><span class="line">        Person *p1 = [[Person alloc] init];</span><br><span class="line">        __strong Person *p2 = [[Person alloc] init];</span><br><span class="line">    &#125;</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>弱指针需要明确说明(注意：千万不要使用弱指针保存薪创建的对象)</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">int main(int argc, const char * argv[]) &#123;</span><br><span class="line">    @autoreleasepool &#123;</span><br><span class="line">        // p是弱指针, 对象会被立即释放</span><br><span class="line">        __weak Person *p1 = [[Person alloc] init];</span><br><span class="line">    &#125;</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h5 id="4-5-ARC-下多对象内存管理"><a href="#4-5-ARC-下多对象内存管理" class="headerlink" title="4.5 ARC 下多对象内存管理"></a>4.5 <code>ARC</code> 下多对象内存管理</h5><p><code>ARC</code> 和 <code>MRC</code> 一样，想拥有某个对象必须用强指针保存对象，但是不需要在 <code>dealloc</code> 中 <code>release</code>。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">@interface Person : NSObject</span><br><span class="line">// MRC写法</span><br><span class="line">//@property (nonatomic, retain) Dog *dog;</span><br><span class="line"></span><br><span class="line">// ARC写法</span><br><span class="line">@property (nonatomic, strong) Dog *dog;</span><br><span class="line">@end</span><br></pre></td></tr></table></figure></p>
+<h5 id="4-6-ARC-中的-property-参数"><a href="#4-6-ARC-中的-property-参数" class="headerlink" title="4.6 ARC 中的 @property 参数"></a>4.6 <code>ARC</code> 中的 <code>@property</code> 参数</h5><ul>
+<li><code>strong</code>: 用于 <code>OC</code> 对象，相当于 <code>MRC</code> 中的 <code>retain</code></li>
+<li><code>weak</code>: 用于 <code>OC</code> 对象，相当于 <code>MRC</code> 中的 <code>assign</code></li>
+<li><code>assign</code>: 用于基本数据类型，跟 <code>MRC</code> 中 <code>assign</code> 一样。</li>
+</ul>
+<h5 id="4-7-ARC-下循环引用问题"><a href="#4-7-ARC-下循环引用问题" class="headerlink" title="4.7 ARC 下循环引用问题"></a>4.7 <code>ARC</code> 下循环引用问题</h5><p><code>ARC</code> 跟 <code>MRC</code> 一样，如果 <code>A</code> 拥有 <code>B</code>，<code>B</code> 拥有 <code>A</code>，那么必须一方使用弱指针。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">@interface Person : NSObject</span><br><span class="line">@property (nonatomic, strong) Dog *dog;</span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">@interface Dog : NSObject</span><br><span class="line">// 错误写法, 循环引用会导致内存泄露</span><br><span class="line">//@property (nonatomic, strong) Person *owner;</span><br><span class="line"></span><br><span class="line">// 正确写法, 当如果保存对象建议使用weak</span><br><span class="line">@property (nonatomic, weak) Person *owner;</span><br><span class="line">@end</span><br></pre></td></tr></table></figure></p>
+<h3 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h3><p>最近两年一直在使用 <code>Swift</code>，对 <code>OC</code> 的一些基础知识遗忘了不少，通过这篇博客算是温习一些。接下来打算在细读一遍 《Objective-C高级编程》，来对 <code>ARC</code> 、 <code>Blocks</code> 、 <code>GCD</code> 做一个系统的复习。</p>
+
+    </div>
+
+    
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">
+        -------------本文结束 <i class="fa fa-paw"></i> 感谢您的阅读-------------
+        </div>
+    
+</div>
+      
+        <div class="reward-container">
+  <div>我就是加这个功能好看点，没别的意思🥺</div>
+  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Hsu 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.png" alt="Hsu 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Hsu
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://xxhsu.com/2019/11/11/iOS%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E5%88%86%E6%9E%90/" title="iOS内存管理分析">http://xxhsu.com/2019/11/11/iOS内存管理分析/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/null" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/iOS-内存-面试/" rel="tag"><i class="fa fa-tag"></i> iOS,内存,面试</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/2019/11/01/iOS内存分配：堆、栈、全局区、常量区、代码区/" rel="next" title="iOS内存分配：堆、栈、全局区、常量区、代码区">
+                  <i class="fa fa-chevron-left"></i> iOS内存分配：堆、栈、全局区、常量区、代码区
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/2019/11/11/源码阅读CTMediator/" rel="prev" title="源码阅读CTMediator">
+                  源码阅读CTMediator <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#正文"><span class="nav-number">2.</span> <span class="nav-text">正文</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#一、什么是内存管理"><span class="nav-number">2.0.1.</span> <span class="nav-text">一、什么是内存管理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#二、内存管理模型"><span class="nav-number">2.0.2.</span> <span class="nav-text">二、内存管理模型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#三、-MRC-手动管理内存（Manual-Reference-Counting）"><span class="nav-number">2.0.3.</span> <span class="nav-text">三、 MRC 手动管理内存（Manual Reference Counting）</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-引用计数器"><span class="nav-number">2.0.3.1.</span> <span class="nav-text">1. 引用计数器</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-引用计数操作"><span class="nav-number">2.0.3.2.</span> <span class="nav-text">2. 引用计数操作</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-dealloc-方法"><span class="nav-number">2.0.3.3.</span> <span class="nav-text">3. dealloc 方法</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-野指针和空指针"><span class="nav-number">2.0.3.4.</span> <span class="nav-text">4. 野指针和空指针</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#5-内存管理规律"><span class="nav-number">2.0.3.5.</span> <span class="nav-text">5. 内存管理规律</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#6-property-参数"><span class="nav-number">2.0.3.6.</span> <span class="nav-text">6. @property 参数</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#7-自动释放池"><span class="nav-number">2.0.3.7.</span> <span class="nav-text">7. 自动释放池</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#7-1-使用-autorelease-有什么好处呢？"><span class="nav-number">2.0.3.7.1.</span> <span class="nav-text">7.1 使用 autorelease 有什么好处呢？</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#7-2-autorelease-的原理实质上是什么？"><span class="nav-number">2.0.3.7.2.</span> <span class="nav-text">7.2 autorelease 的原理实质上是什么？</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#7-3-autorelease-的创建方法"><span class="nav-number">2.0.3.7.3.</span> <span class="nav-text">7.3 autorelease 的创建方法</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#7-4-autorelease-的使用方法"><span class="nav-number">2.0.3.7.4.</span> <span class="nav-text">7.4 autorelease 的使用方法</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#7-5-autorelease-的注意事项"><span class="nav-number">2.0.3.7.5.</span> <span class="nav-text">7.5 autorelease 的注意事项</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#7-6-自动释放池的嵌套调用"><span class="nav-number">2.0.3.7.6.</span> <span class="nav-text">7.6 自动释放池的嵌套调用</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#7-7-autorelease-错误用法"><span class="nav-number">2.0.3.7.7.</span> <span class="nav-text">7.7 autorelease 错误用法</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#8-MRC-中避免循环-retian"><span class="nav-number">2.0.3.8.</span> <span class="nav-text">8. MRC 中避免循环 retian</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#四、ARC-自动管理内存（Automatic-Reference-Counting）"><span class="nav-number">2.0.4.</span> <span class="nav-text">四、ARC 自动管理内存（Automatic Reference Counting）</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#4-1-ARC-的判断原则"><span class="nav-number">2.0.4.1.</span> <span class="nav-text">4.1 ARC 的判断原则</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-2-ARC-的使用"><span class="nav-number">2.0.4.2.</span> <span class="nav-text">4.2 ARC 的使用</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-3-ARC-的注意点"><span class="nav-number">2.0.4.3.</span> <span class="nav-text">4.3 ARC 的注意点</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-4-ARC-下对象内存管理"><span class="nav-number">2.0.4.4.</span> <span class="nav-text">4.4 ARC 下对象内存管理</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-5-ARC-下多对象内存管理"><span class="nav-number">2.0.4.5.</span> <span class="nav-text">4.5 ARC 下多对象内存管理</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-6-ARC-中的-property-参数"><span class="nav-number">2.0.4.6.</span> <span class="nav-text">4.6 ARC 中的 @property 参数</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-7-ARC-下循环引用问题"><span class="nav-number">2.0.4.7.</span> <span class="nav-text">4.7 ARC 下循环引用问题</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#后记"><span class="nav-number">2.1.</span> <span class="nav-text">后记</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Hsu"
+    src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">Hsu</p>
+  <div class="site-description" itemprop="description">记录一些知识，记录一些生活，记录一些足迹</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/yourname" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;yourname" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:yourname@gmail.com" title="E-Mail &amp;rarr; mailto:yourname@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/yourname" title="Weibo &amp;rarr; https:&#x2F;&#x2F;weibo.com&#x2F;yourname" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.jianshu.com/u/db56e4cae85b" title="简  书 &amp;rarr; https:&#x2F;&#x2F;www.jianshu.com&#x2F;u&#x2F;db56e4cae85b" rel="noopener" target="_blank"><i class="fa fa-fw fa-stack-overflow"></i>简  书</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/null" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title">
+      <i class="fa fa-fw fa-link"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="http://baidu.com/" title="http:&#x2F;&#x2F;baidu.com" rel="noopener" target="_blank">百度</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://google.com/" title="http:&#x2F;&#x2F;google.com" rel="noopener" target="_blank">谷歌</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Hsu</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">56k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">51 分钟</span>
+</div>
+
+
+  
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?0c58a1486de42ac6cc1c59c7d98ae887"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"left","width":100,"height":200},"mobile":{"show":true},"log":false,"tagMode":false});</script></body>
+</html>
