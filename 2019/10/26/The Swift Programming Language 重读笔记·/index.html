@@ -175,7 +175,7 @@
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">9</span></a>
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">7</span></a>
 
   </li>
         <li class="menu-item menu-item-commonweal">
@@ -425,12 +425,12 @@
 <li><p>闭包是引用类型！！</p>
 </li>
 <li><p>在逃逸闭包内必须显示的调用 <code>self</code> ，非逃逸闭包则必须要。所谓逃逸闭包，就是指函数返回后才会执行的闭包。典型的就是网络闭包，在请求结束后才会执行。还有自动闭包 <code>autoclosure</code> ，但是这个并不建议使用过多。</p>
- <figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">func</span> <span class="title">viewDidLoad</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">super</span>.viewDidLoad()</span><br><span class="line">    </span><br><span class="line">    someFunctionWithNonescapingClosure &#123;</span><br><span class="line">        x = <span class="number">50</span></span><br><span class="line">    &#125;</span><br><span class="line">    someFunctionWithEscapingClosure &#123;</span><br><span class="line">        <span class="keyword">self</span>.x = <span class="number">100</span></span><br><span class="line">    &#125;</span><br><span class="line">    someFuncationWithAutoclosureClosure(closure: <span class="string">"Hello"</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/// 非逃逸闭包</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">someFunctionWithNonescapingClosure</span><span class="params">(closure: <span class="params">()</span></span></span> -&gt; <span class="type">Void</span>) &#123;</span><br><span class="line">     closure()</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/// 逃逸闭包</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">someFunctionWithEscapingClosure</span><span class="params">(closure: @escaping <span class="params">()</span></span></span> -&gt; <span class="type">Void</span>) &#123;</span><br><span class="line">    closure()</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/// 自动转化闭包</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">someFuncationWithAutoclosureClosure</span><span class="params">(closure: @autoclosure <span class="params">()</span></span></span> -&gt; <span class="type">String</span>) &#123;</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"\(closure())"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+ <figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">func</span> <span class="title">viewDidLoad</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">super</span>.viewDidLoad()</span><br><span class="line">    </span><br><span class="line">    someFunctionWithNonescapingClosure &#123;</span><br><span class="line">        x = <span class="number">50</span></span><br><span class="line">    &#125;</span><br><span class="line">    someFunctionWithEscapingClosure &#123;</span><br><span class="line">        <span class="keyword">self</span>.x = <span class="number">100</span></span><br><span class="line">    &#125;</span><br><span class="line">    someFuncationWithAutoclosureClosure(closure: <span class="string">"Hello"</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/// 非逃逸闭包</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">someFunctionWithNonescapingClosure</span><span class="params">(closure: <span class="params">()</span></span></span> -&gt; <span class="type">Void</span>) &#123;</span><br><span class="line">     closure()</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/// 逃逸闭包</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">someFunctionWithEscapingClosure</span><span class="params">(closure: @escaping <span class="params">()</span></span></span> -&gt; <span class="type">Void</span>) &#123;</span><br><span class="line">    closure()</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/// 自动转化闭包</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">someFuncationWithAutoclosureClosure</span><span class="params">(closure: @autoclosure <span class="params">()</span></span></span> -&gt; <span class="type">String</span>) &#123;</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"<span class="subst">\(closure()</span>)"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 </li>
 </ol>
 <h4 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h4><ol>
 <li><p>令枚举遵循 <code>CaseIterable</code> 协议。<code>Swift</code> 会生成一个 <code>allCases</code> 属性，用于一个包含枚举所有成员的集合。如：</p>
- <figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">enum</span> <span class="title">Beverage</span>: <span class="title">CaseIterable</span> </span>&#123;</span><br><span class="line">    <span class="keyword">case</span> coffee, tea, juice</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">let</span> numberOfChoices = <span class="type">Beverage</span>.allCases.<span class="built_in">count</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">"\(numberOfChoices) beverages available"</span>)</span><br><span class="line"><span class="comment">// 打印“3 beverages available”</span></span><br></pre></td></tr></table></figure>
+ <figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">enum</span> <span class="title">Beverage</span>: <span class="title">CaseIterable</span> </span>&#123;</span><br><span class="line">    <span class="keyword">case</span> coffee, tea, juice</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">let</span> numberOfChoices = <span class="type">Beverage</span>.allCases.<span class="built_in">count</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">"<span class="subst">\(numberOfChoices)</span> beverages available"</span>)</span><br><span class="line"><span class="comment">// 打印“3 beverages available”</span></span><br></pre></td></tr></table></figure>
 </li>
 </ol>
 <ol start="2">
@@ -795,8 +795,8 @@
             <span class="post-nav-divider"></span>
 
             <div class="post-nav-prev post-nav-item">
-                <a href="/2019/10/30/我每天打开网页都干了啥/" rel="prev" title="我每天打开网页都干了啥">
-                  我每天打开网页都干了啥 <i class="fa fa-chevron-right"></i>
+                <a href="/2019/11/01/iOS内存分配：堆、栈、全局区、常量区、代码区/" rel="prev" title="iOS内存分配：堆、栈、全局区、常量区、代码区">
+                  iOS内存分配：堆、栈、全局区、常量区、代码区 <i class="fa fa-chevron-right"></i>
                 </a>
             </div>
           </div>
@@ -852,7 +852,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">9</span>
+          <span class="site-state-item-count">7</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -928,7 +928,7 @@
       <i class="fa fa-area-chart"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">61k</span>
+    <span title="站点总字数">62k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
