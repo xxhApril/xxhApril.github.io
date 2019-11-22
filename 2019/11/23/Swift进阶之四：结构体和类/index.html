@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.7.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"mac"},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="结构体和类下面是结构体和类的主要区别：">
+<meta name="keywords" content="iOS,技术,分享,记录,笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Swift进阶之四：结构体和类">
+<meta property="og:url" content="http://xxhsu.com/2019/11/23/Swift进阶之四：结构体和类/index.html">
+<meta property="og:site_name" content="风和向日葵">
+<meta property="og:description" content="结构体和类下面是结构体和类的主要区别：">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-11-22T10:50:21.025Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Swift进阶之四：结构体和类">
+<meta name="twitter:description" content="结构体和类下面是结构体和类的主要区别：">
+
+<link rel="canonical" href="http://xxhsu.com/2019/11/23/Swift进阶之四：结构体和类/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Swift进阶之四：结构体和类 | 风和向日葵</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?f3be994bce43cea26cc0e3f96fe1c107";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">风和向日葵</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">四月的博客</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">6</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">0</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">15</span></a>
+
+  </li>
+        <li class="menu-item menu-item-commonweal">
+
+    <a href="/404/" rel="section"><i class="fa fa-fw fa-heartbeat"></i>公益 404</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/xxhApril" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xxhsu.com/2019/11/23/Swift进阶之四：结构体和类/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Hsu">
+      <meta itemprop="description" content="记录一些知识，记录一些生活，记录一些足迹">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="风和向日葵">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          Swift进阶之四：结构体和类
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2019-11-22 18:48:28 / 修改时间：10:50:21" itemprop="dateCreated datePublished" datetime="2019-11-22T18:48:28Z">2019-11-22</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>3.2k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="结构体和类"><a href="#结构体和类" class="headerlink" title="结构体和类"></a>结构体和类</h2><p>下面是结构体和类的主要区别：</p>
+<a id="more"></a>
+<ul>
+<li>结构体（和枚举）是<strong>值类型</strong>，类是<strong>引用类型</strong>。再设计结构体时，我们可以要求编译器保证不可变性。对类来说，我们要自己确保这件事情。</li>
+<li>内存管理方式有所不同。结构体可以直接别持有和访问，但是类的实例只能通过引用间接的访问。结构体不会被引用，但是会被复制。也就是说，结构体的持有者是唯一的，而类却可以有多个持有者。</li>
+<li>使用类可以通过继承来共享代码。而结构体是不能被继承的，想要在不同的结构体之间共享代码，就需要使用不同的组合，如组合、泛型以及协议扩展等。</li>
+</ul>
+<h3 id="值类型"><a href="#值类型" class="headerlink" title="值类型"></a>值类型</h3><ol>
+<li>结构体只有一个持有者。比如，当我们将结构体变量传递给一个函数时，函数将接收到结构体的复制，它也只能改变自己的这份复制，这叫做 <strong>值语义（<code>value semantics</code>）</strong>，有时也叫作复制语义。而对对象来说，它们是通过传递引用来工作的，因此类对象会拥有很多持有者，这叫做 <strong>引用语义（<code>reference semantics</code>）</strong>。</li>
+<li>因为结构体只有一个持有者，所以它不会造成循环引用。而类和函数都属于引用类型，要避免造成循环引用的问题。</li>
+</ol>
+<h3 id="可变性"><a href="#可变性" class="headerlink" title="可变性"></a>可变性</h3><p>可变性会带来一些隐藏的问题，因为，总是无法保证一个对象修改后，所以相关的引用也需要这次改动。</p>
+<h3 id="结构体"><a href="#结构体" class="headerlink" title="结构体"></a>结构体</h3><ol>
+<li>对结构体进行改变，从语义上来说，与重新为它赋值是一样的。当我们改变结构体中某个属性时，意味着改变了结构体，会触发该结构体的属性观察器。如下：<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ViewController</span>: <span class="title">UIViewController</span> </span>&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">Rectangle</span> </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> width: <span class="type">Int</span></span><br><span class="line">        <span class="keyword">var</span> height: <span class="type">Int</span></span><br><span class="line">        <span class="keyword">var</span> someOne: <span class="type">Person</span></span><br><span class="line">        <span class="keyword">var</span> room: <span class="type">Room</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">Room</span> </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> number: <span class="type">Int</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> name: <span class="type">String</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">init</span>(n: <span class="type">String</span>) &#123;</span><br><span class="line">            <span class="keyword">self</span>.name = n</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">var</span> screen = <span class="type">Rectangle</span>(width: <span class="number">0</span>, height: <span class="number">0</span>, someOne: <span class="type">Person</span>(n: <span class="string">"Tom"</span>), room: <span class="type">Room</span>(number: <span class="number">100</span>)) &#123;</span><br><span class="line">        <span class="keyword">didSet</span> &#123;</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">"Screen changed: <span class="subst">\(screen)</span>"</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">func</span> <span class="title">viewDidLoad</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="keyword">super</span>.viewDidLoad()</span><br><span class="line">        screen.width = <span class="number">10</span></span><br><span class="line">        <span class="built_in">print</span>(<span class="string">"----------分割线----------"</span>)</span><br><span class="line">        screen.someOne = <span class="type">Person</span>(n: <span class="string">"Lilei"</span>)</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">"----------分割线----------"</span>)</span><br><span class="line">        screen.someOne.name = <span class="string">"Jack"</span></span><br><span class="line">        <span class="built_in">print</span>(<span class="string">"----------分割线----------"</span>)</span><br><span class="line">        screen.room.number = <span class="number">24</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">打印结果：</span><br><span class="line"><span class="type">Screen</span> changed: <span class="type">Rectangle</span>(width: <span class="number">10</span>, height: <span class="number">0</span>, someOne: <span class="type">SwiftDeep</span>.<span class="type">ViewController</span>.<span class="type">Person</span>, room: <span class="type">SwiftDeep</span>.<span class="type">ViewController</span>.<span class="type">Room</span>(number: <span class="number">100</span>))</span><br><span class="line">----------分割线----------</span><br><span class="line"><span class="type">Screen</span> changed: <span class="type">Rectangle</span>(width: <span class="number">10</span>, height: <span class="number">0</span>, someOne: <span class="type">SwiftDeep</span>.<span class="type">ViewController</span>.<span class="type">Person</span>, room: <span class="type">SwiftDeep</span>.<span class="type">ViewController</span>.<span class="type">Room</span>(number: <span class="number">100</span>))</span><br><span class="line">----------分割线----------</span><br><span class="line">----------分割线----------</span><br><span class="line"><span class="type">Screen</span> changed: <span class="type">Rectangle</span>(width: <span class="number">10</span>, height: <span class="number">0</span>, someOne: <span class="type">SwiftDeep</span>.<span class="type">ViewController</span>.<span class="type">Person</span>, room: <span class="type">SwiftDeep</span>.<span class="type">ViewController</span>.<span class="type">Room</span>(number: <span class="number">24</span>))</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<ul>
+<li>结构体内部属性，或者内部结构体即结构体属性发生变化时，最外层的结构体也会被改变</li>
+<li>结构体内部对象改变时，因为引用地址改变，外层结构体改变</li>
+<li>结构体内部对象的属性改变时，因为对象引用地址未变，所以外层结构体不会重新赋值</li>
+</ul>
+<h3 id="写时复制"><a href="#写时复制" class="headerlink" title="写时复制"></a>写时复制</h3><p>对于 <code>Swift</code> 来说，字典是直接存在堆上的，简单看个例子：<br><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>]</span><br><span class="line"><span class="keyword">let</span> b = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>]</span><br><span class="line"><span class="keyword">let</span> <span class="built_in">c</span> = a</span><br><span class="line"><span class="built_in">print</span>(<span class="string">"a address: "</span>, <span class="type">Unmanaged</span>.passRetained(a <span class="keyword">as</span> <span class="type">AnyObject</span>).toOpaque())</span><br><span class="line"><span class="built_in">print</span>(<span class="string">"b address: "</span>, <span class="type">Unmanaged</span>.passRetained(b <span class="keyword">as</span> <span class="type">AnyObject</span>).toOpaque())</span><br><span class="line"><span class="built_in">print</span>(<span class="string">"c address: "</span>, <span class="type">Unmanaged</span>.passRetained(<span class="built_in">c</span> <span class="keyword">as</span> <span class="type">AnyObject</span>).toOpaque())</span><br><span class="line">a.append(<span class="number">10</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">"a new address: "</span>, <span class="type">Unmanaged</span>.passRetained(a <span class="keyword">as</span> <span class="type">AnyObject</span>).toOpaque())</span><br><span class="line">输出：</span><br><span class="line">a address:  <span class="number">0x00006000009e6ee0</span></span><br><span class="line">b address:  <span class="number">0x00006000009d5680</span></span><br><span class="line"><span class="built_in">c</span> address:  <span class="number">0x00006000009b1620</span></span><br><span class="line">a new address:  <span class="number">0x00006000009d8b00</span></span><br></pre></td></tr></table></figure></p>
+<p>备注：书中说，<strong>如果 <code>c = a</code>，在 <code>c</code> 不改变时，这两个数组指向内存中同一个位置，这两个数组共享了它们的存储部分</strong>。但是我打印数组的指针地址和书中描述的是不一致的。不知道是否理解有误。</p>
+<h4 id="写时复制（昂贵方式）"><a href="#写时复制（昂贵方式）" class="headerlink" title="写时复制（昂贵方式）"></a>写时复制（昂贵方式）</h4><p>即每次都创建一个私有备份，重新赋值</p>
+<h4 id="写时复制（高效方式）"><a href="#写时复制（高效方式）" class="headerlink" title="写时复制（高效方式）"></a>写时复制（高效方式）</h4><p>主要通过系统 <code>API</code> <code>isKnownUniquelyReferenced(&lt;#T##object: &amp;T##T#&gt;)</code> 判断对象是否唯一引用的，是的话就原地修改。</p>
+<h4 id="写时复制的陷阱"><a href="#写时复制的陷阱" class="headerlink" title="写时复制的陷阱"></a>写时复制的陷阱</h4><p>简单来说，除非必须，还是少用为好。理解原理即可。</p>
+<h3 id="闭包和可变性"><a href="#闭包和可变性" class="headerlink" title="闭包和可变性"></a>闭包和可变性</h3><ol>
+<li>函数（包括闭包）是引用类型。</li>
+<li><code>Swift</code> 的结构体一般被储存在栈上，而非堆上。不过这其实是一种优化：默认情况下，结构体时存储在堆上的，但是绝大多数时候，这个优化会生效，并将结构体存储到栈上。当结构体被一个函数闭合时，优化将不再生效，此时这个结构体将存储在堆上。与此类似，如果结构体太大，它也会被存储在堆上。</li>
+</ol>
+<h3 id="内存"><a href="#内存" class="headerlink" title="内存"></a>内存</h3><p>值类型不用大新循环引用的问题，如下：<br><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> name: <span class="type">String</span></span><br><span class="line">    <span class="keyword">var</span> parents: [<span class="type">Person</span>]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> john = <span class="type">Person</span>(name: <span class="string">"John"</span>, parents: [])</span><br><span class="line">john.parents = [john]</span><br><span class="line">john <span class="comment">// Person(name: "John", parents: [Person(name: "John", parents: [])])</span></span><br></pre></td></tr></table></figure></p>
+<p>因为值类型始终是复制，持有至只要一个，所以不会循环引用。</p>
+<h4 id="weak-引用-和-unowned-引用"><a href="#weak-引用-和-unowned-引用" class="headerlink" title="weak 引用 和 unowned 引用"></a><code>weak</code> 引用 和 <code>unowned</code> 引用</h4><ol>
+<li><code>weak</code> 表示不增加引用计数，当引用对象被释放时，则<code>weak</code> 对象置为 <code>nil</code>,所以被 <code>weak</code> 修饰的对象都是可选值类型。<code>unowned</code> 需要确保被引用对象始终有效，本身不会主动置为 <code>nil</code>。</li>
+<li><code>unowned</code> 容易造成僵尸对象，好处则是可以用 <code>let</code> 修饰。其实建议更多的使用<code>weak</code> ，强制我们自己去处理 <code>nil</code> 情况。</li>
+</ol>
+<h3 id="闭包和内存"><a href="#闭包和内存" class="headerlink" title="闭包和内存"></a>闭包和内存</h3><p>通过使用 <strong>捕获列表</strong> 将捕获变量标记为 <code>weak</code> 或者 <code>unowned</code> 来解决循环引用。</p>
+
+    </div>
+
+    
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">
+        -------------本文结束 <i class="fa fa-paw"></i> 感谢您的阅读-------------
+        </div>
+    
+</div>
+      
+        <div class="reward-container">
+  <div>我就是加这个功能好看点，没别的意思🥺</div>
+  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Hsu 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.png" alt="Hsu 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Hsu
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://xxhsu.com/2019/11/23/Swift%E8%BF%9B%E9%98%B6%E4%B9%8B%E5%9B%9B%EF%BC%9A%E7%BB%93%E6%9E%84%E4%BD%93%E5%92%8C%E7%B1%BB/" title="Swift进阶之四：结构体和类">http://xxhsu.com/2019/11/23/Swift进阶之四：结构体和类/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/null" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/2019/11/23/Swift进阶之三：可选值/" rel="next" title="Swift进阶之三：可选值">
+                  <i class="fa fa-chevron-left"></i> Swift进阶之三：可选值
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/2019/11/23/Swift进阶之五：函数/" rel="prev" title="Swift进阶之五：函数">
+                  Swift进阶之五：函数 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#结构体和类"><span class="nav-number">1.</span> <span class="nav-text">结构体和类</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#值类型"><span class="nav-number">1.1.</span> <span class="nav-text">值类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#可变性"><span class="nav-number">1.2.</span> <span class="nav-text">可变性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#结构体"><span class="nav-number">1.3.</span> <span class="nav-text">结构体</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#写时复制"><span class="nav-number">1.4.</span> <span class="nav-text">写时复制</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#写时复制（昂贵方式）"><span class="nav-number">1.4.1.</span> <span class="nav-text">写时复制（昂贵方式）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#写时复制（高效方式）"><span class="nav-number">1.4.2.</span> <span class="nav-text">写时复制（高效方式）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#写时复制的陷阱"><span class="nav-number">1.4.3.</span> <span class="nav-text">写时复制的陷阱</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#闭包和可变性"><span class="nav-number">1.5.</span> <span class="nav-text">闭包和可变性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#内存"><span class="nav-number">1.6.</span> <span class="nav-text">内存</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#weak-引用-和-unowned-引用"><span class="nav-number">1.6.1.</span> <span class="nav-text">weak 引用 和 unowned 引用</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#闭包和内存"><span class="nav-number">1.7.</span> <span class="nav-text">闭包和内存</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Hsu"
+    src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">Hsu</p>
+  <div class="site-description" itemprop="description">记录一些知识，记录一些生活，记录一些足迹</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/yourname" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;yourname" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:yourname@gmail.com" title="E-Mail &amp;rarr; mailto:yourname@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/yourname" title="Weibo &amp;rarr; https:&#x2F;&#x2F;weibo.com&#x2F;yourname" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.jianshu.com/u/db56e4cae85b" title="简  书 &amp;rarr; https:&#x2F;&#x2F;www.jianshu.com&#x2F;u&#x2F;db56e4cae85b" rel="noopener" target="_blank"><i class="fa fa-fw fa-stack-overflow"></i>简  书</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/null" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title">
+      <i class="fa fa-fw fa-link"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="http://baidu.com/" title="http:&#x2F;&#x2F;baidu.com" rel="noopener" target="_blank">百度</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://google.com/" title="http:&#x2F;&#x2F;google.com" rel="noopener" target="_blank">谷歌</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Hsu</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">78k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">1:11</span>
+</div>
+
+
+  
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?0c58a1486de42ac6cc1c59c7d98ae887"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"left","width":100,"height":200},"mobile":{"show":true},"log":false,"tagMode":false});</script></body>
+</html>

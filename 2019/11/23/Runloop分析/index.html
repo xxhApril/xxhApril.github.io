@@ -52,21 +52,21 @@
   };
 </script>
 
-  <meta name="description" content="RunLoop 参考：深入理解RunLoopibireme：《深入理解RunLoop》 Runloop 的概念首先，让一个线程随时能处理事件，但是并不退出，这样额模型通常称作 Event Loop，如下：1234567funcation loop() &amp;#123;    initialize();    do &amp;#123;        var message = get_next_message">
+  <meta name="description" content="RunLoop 参考：深入理解RunLoopibireme：《深入理解RunLoop》">
 <meta name="keywords" content="iOS,技术,分享,记录,笔记">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Runloop分析">
 <meta property="og:url" content="http://xxhsu.com/2019/11/23/Runloop分析/index.html">
 <meta property="og:site_name" content="风和向日葵">
-<meta property="og:description" content="RunLoop 参考：深入理解RunLoopibireme：《深入理解RunLoop》 Runloop 的概念首先，让一个线程随时能处理事件，但是并不退出，这样额模型通常称作 Event Loop，如下：1234567funcation loop() &amp;#123;    initialize();    do &amp;#123;        var message = get_next_message">
+<meta property="og:description" content="RunLoop 参考：深入理解RunLoopibireme：《深入理解RunLoop》">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://i.loli.net/2019/11/21/mIRNLsuBScf4O2J.png">
 <meta property="og:image" content="https://i.loli.net/2019/11/21/sKQS28HIniOJDpd.png">
 <meta property="og:image" content="https://i.loli.net/2019/11/20/KfWci8M9mUjIJEo.png">
-<meta property="og:updated_time" content="2019-11-22T09:57:46.764Z">
+<meta property="og:updated_time" content="2019-11-22T10:36:04.154Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Runloop分析">
-<meta name="twitter:description" content="RunLoop 参考：深入理解RunLoopibireme：《深入理解RunLoop》 Runloop 的概念首先，让一个线程随时能处理事件，但是并不退出，这样额模型通常称作 Event Loop，如下：1234567funcation loop() &amp;#123;    initialize();    do &amp;#123;        var message = get_next_message">
+<meta name="twitter:description" content="RunLoop 参考：深入理解RunLoopibireme：《深入理解RunLoop》">
 <meta name="twitter:image" content="https://i.loli.net/2019/11/21/mIRNLsuBScf4O2J.png">
 
 <link rel="canonical" href="http://xxhsu.com/2019/11/23/Runloop分析/">
@@ -179,7 +179,7 @@
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">7</span></a>
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">15</span></a>
 
   </li>
         <li class="menu-item menu-item-commonweal">
@@ -261,7 +261,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2019-11-22 17:57:10 / 修改时间：09:57:46" itemprop="dateCreated datePublished" datetime="2019-11-22T17:57:10Z">2019-11-22</time>
+              <time title="创建时间：2019-11-22 17:57:10 / 修改时间：10:36:04" itemprop="dateCreated datePublished" datetime="2019-11-22T17:57:10Z">2019-11-22</time>
             </span>
 
           
@@ -297,8 +297,8 @@
 
       
         <h2 id="RunLoop-参考：深入理解RunLoop"><a href="#RunLoop-参考：深入理解RunLoop" class="headerlink" title="RunLoop 参考：深入理解RunLoop"></a>RunLoop 参考：深入理解RunLoop</h2><p><a href="https://blog.ibireme.com/2015/05/18/runloop/" target="_blank" rel="noopener">ibireme：《深入理解RunLoop》</a></p>
-<h3 id="Runloop-的概念"><a href="#Runloop-的概念" class="headerlink" title="Runloop 的概念"></a>Runloop 的概念</h3><p>首先，让一个线程随时能处理事件，但是并不退出，这样额模型通常称作 <code>Event Loop</code>，如下：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">funcation loop() &#123;</span><br><span class="line">    initialize();</span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        var message = get_next_message();</span><br><span class="line">        process_message(message);</span><br><span class="line">    &#125; <span class="keyword">while</span> (message != quit);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <a id="more"></a>
+<h3 id="Runloop-的概念"><a href="#Runloop-的概念" class="headerlink" title="Runloop 的概念"></a>Runloop 的概念</h3><p>首先，让一个线程随时能处理事件，但是并不退出，这样额模型通常称作 <code>Event Loop</code>，如下：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">funcation loop() &#123;</span><br><span class="line">    initialize();</span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        var message = get_next_message();</span><br><span class="line">        process_message(message);</span><br><span class="line">    &#125; <span class="keyword">while</span> (message != quit);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>实现这种模型的关键点在于：如何管理事件/消息，如何让线程在没有消息处理时休眠以避免资源浪费，在消息到来时立刻被唤醒。</p>
 <p><code>Runloop</code> 实际上就是一个对象，这个对象管理了其所需要处理的事件和消息，并提供一个入口函数来执行上面的 <code>Event Loop</code> 逻辑。线程执行了这个函数后，就会一直处于喊个函数内部 “接收消息-&gt;等待-&gt;处理”的循环中，直到这个循环结束（如返回 <code>quit</code> 消息），函数返回。</p>
 <p><code>iOS/MacOS</code> 提供了两个这样的对象：<code>NSRunLoop</code> 和 <code>CFRunLoopRef</code>。</p>
@@ -483,6 +483,9 @@
             <span class="post-nav-divider"></span>
 
             <div class="post-nav-prev post-nav-item">
+                <a href="/2019/11/23/Swift进阶之一：内建集合类型/" rel="prev" title="Swift进阶之一：内建集合类型">
+                  Swift进阶之一：内建集合类型 <i class="fa fa-chevron-right"></i>
+                </a>
             </div>
           </div>
       </footer>
@@ -537,7 +540,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-count">15</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -613,13 +616,13 @@
       <i class="fa fa-area-chart"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">62k</span>
+    <span title="站点总字数">78k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">56 分钟</span>
+    <span title="站点阅读时长">1:11</span>
 </div>
 
 
@@ -664,8 +667,6 @@
   </div>
 
   
-  
-  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
   <script src="/lib/anime.min.js"></script>
   <script src="/lib/velocity/velocity.min.js"></script>
   <script src="/lib/velocity/velocity.ui.min.js"></script>

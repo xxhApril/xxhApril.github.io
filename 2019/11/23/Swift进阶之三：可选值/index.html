@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.7.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"mac"},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="可选值哨岗值 函数返回了一个 魔法 数值来表示函数并没有返回正确的值。这样的值被称为 哨岗值。">
+<meta name="keywords" content="iOS,技术,分享,记录,笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Swift进阶之三：可选值">
+<meta property="og:url" content="http://xxhsu.com/2019/11/23/Swift进阶之三：可选值/index.html">
+<meta property="og:site_name" content="风和向日葵">
+<meta property="og:description" content="可选值哨岗值 函数返回了一个 魔法 数值来表示函数并没有返回正确的值。这样的值被称为 哨岗值。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-11-22T10:48:06.452Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Swift进阶之三：可选值">
+<meta name="twitter:description" content="可选值哨岗值 函数返回了一个 魔法 数值来表示函数并没有返回正确的值。这样的值被称为 哨岗值。">
+
+<link rel="canonical" href="http://xxhsu.com/2019/11/23/Swift进阶之三：可选值/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Swift进阶之三：可选值 | 风和向日葵</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?f3be994bce43cea26cc0e3f96fe1c107";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">风和向日葵</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">四月的博客</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">6</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">0</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">15</span></a>
+
+  </li>
+        <li class="menu-item menu-item-commonweal">
+
+    <a href="/404/" rel="section"><i class="fa fa-fw fa-heartbeat"></i>公益 404</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/xxhApril" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xxhsu.com/2019/11/23/Swift进阶之三：可选值/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Hsu">
+      <meta itemprop="description" content="记录一些知识，记录一些生活，记录一些足迹">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="风和向日葵">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          Swift进阶之三：可选值
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2019-11-22 18:47:19 / 修改时间：10:48:06" itemprop="dateCreated datePublished" datetime="2019-11-22T18:47:19Z">2019-11-22</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>3.6k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="可选值"><a href="#可选值" class="headerlink" title="可选值"></a>可选值</h2><h3 id="哨岗值"><a href="#哨岗值" class="headerlink" title="哨岗值"></a>哨岗值</h3><ol>
+<li>函数返回了一个 <code>魔法</code> 数值来表示函数并没有返回正确的值。这样的值被称为 <strong>哨岗值</strong>。</li>
+</ol>
+<a id="more"></a>
+<ol start="2">
+<li><p>下面举例，说明哨岗值存在的问题：</p>
+ <figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">NSString</span> *someStr;</span><br><span class="line"><span class="keyword">if</span> ([someStr rangeOfString:<span class="string">@"swift"</span>].location != <span class="built_in">NSNotFound</span>) &#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"mention swift"</span>);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"Not"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p> 输出结果是 <code>mention swift</code>，因为 <code>NSNotFound</code> 定义为 <code>static const NSInteger NSNotFound = NSIntegerMax;</code>，而 <code>[someStr rangeOfString:@&quot;swift&quot;].location = 0</code>。</p>
+ <!-- more -->
+</li>
+</ol>
+<h3 id="通过枚举解决魔法数问题"><a href="#通过枚举解决魔法数问题" class="headerlink" title="通过枚举解决魔法数问题"></a>通过枚举解决魔法数问题</h3><p>简单来说，就是通过 <code>关联值</code> 解决放回错误值的情况。 <code>Swift</code> 中有更间断清晰的做法，即 <code>可选值</code>。</p>
+<h3 id="可选值概览"><a href="#可选值概览" class="headerlink" title="可选值概览"></a>可选值概览</h3><h4 id="if-let"><a href="#if-let" class="headerlink" title="if let"></a><code>if let</code></h4><p>同一个 <code>if</code> 语句中可以绑定多个值。并且，后面绑定的值可以基于前面成功解包的值进行操作。如下：<br><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> urlStr = <span class="string">"http://www.objc.io/logo.png"</span></span><br><span class="line"><span class="keyword">if</span> <span class="keyword">let</span> url = <span class="type">URL</span>(string: urlStr),</span><br><span class="line">    <span class="keyword">let</span> data = <span class="keyword">try</span>? <span class="type">Data</span>(contentsOf: url),</span><br><span class="line">    <span class="keyword">let</span> image = <span class="type">UIImage</span>(data: data) &#123;</span><br><span class="line">l   et imageV = <span class="type">UIImageView</span>(image: image)</span><br><span class="line">    <span class="keyword">self</span>.view.addSubview(imageV)</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">"图片获取失败"</span>)</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="while-let"><a href="#while-let" class="headerlink" title="while let"></a><code>while let</code></h4><p><code>while let</code> 与 <code>if let</code> 非常相似，它代表当遇到 <code>nil</code> 时终止的一个循环。</p>
+<h4 id="双重可选值"><a href="#双重可选值" class="headerlink" title="双重可选值"></a>双重可选值</h4><p>即可选值可以嵌套在另一个可选值中。如下：<br><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> numStrs = [<span class="string">"1"</span>, <span class="string">"2"</span>, <span class="string">"three"</span>]</span><br><span class="line"><span class="keyword">let</span> nums = numStrs.<span class="built_in">map</span> &#123; <span class="type">Int</span>($<span class="number">0</span>) &#125;</span><br><span class="line">nums.forEach &#123; (n) <span class="keyword">in</span></span><br><span class="line">    <span class="built_in">print</span>(n)</span><br><span class="line">&#125;</span><br><span class="line">        </span><br><span class="line"><span class="comment">// 使用迭代器</span></span><br><span class="line"><span class="keyword">var</span> iterator = nums.makeIterator()</span><br><span class="line"><span class="keyword">while</span> <span class="keyword">let</span> num = iterator.next() &#123;</span><br><span class="line">    <span class="built_in">print</span>(num)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>其中， <code>next()</code> 方法即是双重可选值的体现。</p>
+<h4 id="if-var-and-while-var"><a href="#if-var-and-while-var" class="headerlink" title="if var and while var"></a><code>if var and while var</code></h4><p>获取一个原始值的副本，但是新值的修改，对原始值没有影响。如下：<br><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> name: <span class="type">String</span>?</span><br><span class="line"><span class="keyword">if</span> <span class="keyword">var</span> newName = name &#123;</span><br><span class="line">  newName = <span class="string">"jack"</span></span><br><span class="line">  <span class="built_in">print</span>(name, newName)</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">  <span class="built_in">print</span>(<span class="string">"name is nil"</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> addr: <span class="type">String</span>? = <span class="string">"china"</span></span><br><span class="line"><span class="keyword">if</span> <span class="keyword">var</span> newAdd = addr &#123;</span><br><span class="line">  newAdd = <span class="string">"china beijing"</span></span><br><span class="line">  <span class="built_in">print</span>(addr, newAdd)</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">  <span class="built_in">print</span>(<span class="string">"addr is nil"</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">输出：</span><br><span class="line">name <span class="keyword">is</span> <span class="literal">nil</span></span><br><span class="line"><span class="type">Optional</span>(<span class="string">"china"</span>) china beijing</span><br></pre></td></tr></table></figure></p>
+<h4 id="解包后可选值的作用域"><a href="#解包后可选值的作用域" class="headerlink" title="解包后可选值的作用域"></a>解包后可选值的作用域</h4><p>简单来说，<code>if</code> 定义的临时值，只用在 <code>if</code> 涵盖的大括号内。适当的使用 <code>guard</code> ，可以使代码更加精简易读。</p>
+<h4 id="可选链"><a href="#可选链" class="headerlink" title="可选链"></a>可选链</h4><p>即 <code>chapters?.preChapter?.priceTip?.price</code> 这样的链式可选，其中任何一个为空，则返回 <code>nil</code>。</p>
+<h4 id="nil-合并运算符"><a href="#nil-合并运算符" class="headerlink" title="nil 合并运算符"></a><code>nil</code> 合并运算符</h4><p>如果值为空时，用一个默认值来替代它：<br><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> price =  chapters?.preChapter?.priceTip?.price ?? <span class="number">0</span></span><br></pre></td></tr></table></figure></p>
+<h4 id="可选值-map"><a href="#可选值-map" class="headerlink" title="可选值 map"></a>可选值 <code>map</code></h4><p><code>map</code>：接受一个闭包，如果可选值有内容，则调用这个闭包对其进行转换。如下：</p>
+ <figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> numStrs = [<span class="string">"1"</span>, <span class="string">"2"</span>, <span class="string">"three"</span>]</span><br><span class="line"><span class="keyword">let</span> nums1 = numStrs.<span class="built_in">map</span> &#123; <span class="type">Int</span>($<span class="number">0</span>) &#125;</span><br><span class="line"></span><br><span class="line">nums1.forEach &#123; (n) <span class="keyword">in</span></span><br><span class="line">    <span class="built_in">print</span>(n)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">输出：</span><br><span class="line"><span class="type">Optional</span>(<span class="number">1</span>)</span><br><span class="line"><span class="type">Optional</span>(<span class="number">2</span>)</span><br><span class="line"><span class="literal">nil</span></span><br></pre></td></tr></table></figure>
+<h4 id="可选值-compactMap"><a href="#可选值-compactMap" class="headerlink" title="可选值 compactMap"></a>可选值 <code>compactMap</code></h4><p><code>compactMap</code> 即 <code>flatMap</code>，已在最新版 <code>swift</code> 中更改命名。</p>
+<p><code>compactMap</code> 和 <code>if let</code> 相似，都是对一个可选值进行展开，如下：<br><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> urlStr = <span class="string">"http://www.objc.io/logo.png"</span></span><br><span class="line"><span class="keyword">let</span> imageV = <span class="type">URL</span>(string: urlStr)</span><br><span class="line">    .flatMap &#123; <span class="keyword">try</span>? <span class="type">Data</span>(contentsOf: $<span class="number">0</span>) &#125;</span><br><span class="line">    .flatMap &#123; <span class="type">UIImage</span>(data: $<span class="number">0</span>) &#125;</span><br><span class="line">    .<span class="built_in">map</span> &#123; <span class="type">UIImageView</span>(image: $<span class="number">0</span>) &#125;</span><br><span class="line"><span class="keyword">if</span> <span class="keyword">let</span> imageView = imageV &#123;</span><br><span class="line">    <span class="keyword">self</span>.view.addSubview(imageView)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h5 id="使用-compactMap-过滤-nil"><a href="#使用-compactMap-过滤-nil" class="headerlink" title="使用 compactMap 过滤 nil"></a>使用 <code>compactMap</code> 过滤 <code>nil</code></h5><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> numStrs = [<span class="string">"1"</span>, <span class="string">"2"</span>, <span class="string">"three"</span>]</span><br><span class="line"><span class="keyword">let</span> nums2 = numStrs.compactMap &#123; <span class="type">Int</span>($<span class="number">0</span>) &#125;</span><br><span class="line">nums2.forEach &#123; (n) <span class="keyword">in</span></span><br><span class="line">    <span class="built_in">print</span>(n)</span><br><span class="line">&#125;</span><br><span class="line">输出：</span><br><span class="line"><span class="number">1</span></span><br><span class="line"><span class="number">2</span></span><br></pre></td></tr></table></figure>
+<h4 id="可选值判等"><a href="#可选值判等" class="headerlink" title="可选值判等"></a>可选值判等</h4><ol>
+<li>当我们使用一个非可选值的时候，如果需要匹配可选值内容，则 <code>Swift</code> 总会将它 <strong>升级</strong> 为一个可选值然后使用。这个隐式转换对于写出清晰紧凑的代码非常有用。</li>
+<li><p>使用下标为一个字典赋值 <code>nil</code>，实际上是将这个键从字典中移除。如下：</p>
+ <figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> dictWithNils: [<span class="type">String</span>: <span class="type">Int</span>?] = [</span><br><span class="line"><span class="string">"one"</span>: <span class="number">1</span>,</span><br><span class="line"><span class="string">"two"</span>: <span class="number">2</span>,</span><br><span class="line"><span class="string">"three"</span>: <span class="literal">nil</span>]</span><br><span class="line">dictWithNils[<span class="string">"two"</span>] = <span class="literal">nil</span></span><br><span class="line"><span class="built_in">print</span>(dictWithNils)</span><br><span class="line">输出：</span><br><span class="line">[<span class="string">"three"</span>: <span class="literal">nil</span>, <span class="string">"one"</span>: <span class="type">Optional</span>(<span class="number">1</span>)]</span><br></pre></td></tr></table></figure>
+<p> 可使用下面仁义方式：</p>
+ <figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">dictWithNils[<span class="string">"two"</span>]? = <span class="literal">nil</span></span><br><span class="line"><span class="comment">// 或者 </span></span><br><span class="line">dictWithNils[<span class="string">"two"</span>] = .some(<span class="literal">nil</span>)</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<pre><code>另外，书中 `dictWithNils[&quot;two&quot;] = Optional(nil)` ，经测试，依然会移除这个键。
+</code></pre><h4 id="switch-case-匹配可选值"><a href="#switch-case-匹配可选值" class="headerlink" title="switch-case 匹配可选值"></a><code>switch-case</code> 匹配可选值</h4><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> [<span class="string">"2"</span>, <span class="string">"foo"</span>, <span class="string">"42"</span>, <span class="string">"100"</span>] &#123;</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">let</span> num = <span class="type">Int</span>(i) &#123;</span><br><span class="line">        <span class="keyword">switch</span> num &#123;</span><br><span class="line">        <span class="keyword">case</span> <span class="number">42</span>:</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">"The meaning of life"</span>)</span><br><span class="line">        <span class="keyword">case</span> <span class="number">0</span> ..&lt; <span class="number">10</span>:</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">"A single digit"</span>)</span><br><span class="line">        <span class="keyword">case</span> <span class="literal">nil</span>:</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">"Not a number"</span>)</span><br><span class="line">        <span class="keyword">default</span>:</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">"A mystery number"</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">"Not a number"</span>)</span><br><span class="line">    &#125;            </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="强制解包的时机"><a href="#强制解包的时机" class="headerlink" title="强制解包的时机"></a>强制解包的时机</h3><blockquote>
+<p>当确定某个值不可能是 <code>nil</code> 时，可以使用叹号。我们应当希望，如果它不巧意外的是 <code>nil</code>，那么程序会直接的挂掉</p>
+</blockquote>
+<h4 id="改进强制解包的错误信息"><a href="#改进强制解包的错误信息" class="headerlink" title="改进强制解包的错误信息"></a>改进强制解包的错误信息</h4><p>定义新的运算符。如下：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">infix</span> <span class="keyword">operator</span> !!</span><br><span class="line"><span class="function"><span class="keyword">func</span> !!&lt;T&gt;<span class="params">(wrapped: T?, failureText: @autoclosure <span class="params">()</span></span></span> -&gt; <span class="type">String</span>) -&gt; <span class="type">T</span> &#123;</span><br><span class="line">     <span class="keyword">if</span> <span class="keyword">let</span> x = wrapped &#123; <span class="keyword">return</span> x &#125;</span><br><span class="line">     <span class="built_in">fatalError</span>(failureText())</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>使用：<br><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> s = <span class="string">"foo"</span></span><br><span class="line"><span class="keyword">let</span> i = <span class="type">Int</span>(s) !! <span class="string">"Expecting integer, got <span class="subst">\(s)</span>"</span></span><br></pre></td></tr></table></figure></p>
+<p>运行，崩溃，并打印信息：<br><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Fatal</span> error: <span class="type">Expecting</span> integer, got foo</span><br></pre></td></tr></table></figure></p>
+<h4 id="在调试版本中进行断言"><a href="#在调试版本中进行断言" class="headerlink" title="在调试版本中进行断言"></a>在调试版本中进行断言</h4><p>定义新的运算符。如下：<br><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">infix</span> <span class="keyword">operator</span> !?</span><br><span class="line"><span class="function"><span class="keyword">func</span> !?&lt;T: ExpressibleByIntegerLiteral&gt; <span class="params">(wrapped: T?, failureText: @autoclosure <span class="params">()</span></span></span> -&gt; <span class="type">String</span>) -&gt; <span class="type">T</span> &#123;</span><br><span class="line">    <span class="built_in">assert</span>(wrapped != <span class="literal">nil</span>, failureText())</span><br><span class="line">    <span class="keyword">return</span> wrapped ?? <span class="number">0</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="多灾多难的隐式可选值"><a href="#多灾多难的隐式可选值" class="headerlink" title="多灾多难的隐式可选值"></a>多灾多难的隐式可选值</h3><p>目前使用隐式解包的原因有两个：</p>
+<ol>
+<li>暂时来说，可能还需要到 <code>Objective-C</code> 里调用哪些没有检查返回是否安全的代码。</li>
+<li>因为一个值只有很短暂的为 <code>nil</code> ，在一段时间后，他就会不再是 <code>nil</code>。如 <code>Xcode</code> 中 <code>Interface Builder</code> 的使用方式。</li>
+</ol>
+
+    </div>
+
+    
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">
+        -------------本文结束 <i class="fa fa-paw"></i> 感谢您的阅读-------------
+        </div>
+    
+</div>
+      
+        <div class="reward-container">
+  <div>我就是加这个功能好看点，没别的意思🥺</div>
+  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Hsu 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.png" alt="Hsu 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Hsu
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://xxhsu.com/2019/11/23/Swift%E8%BF%9B%E9%98%B6%E4%B9%8B%E4%B8%89%EF%BC%9A%E5%8F%AF%E9%80%89%E5%80%BC/" title="Swift进阶之三：可选值">http://xxhsu.com/2019/11/23/Swift进阶之三：可选值/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/null" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/2019/11/23/Swift进阶之二：集合类型协议/" rel="next" title="Swift进阶之二：集合类型协议">
+                  <i class="fa fa-chevron-left"></i> Swift进阶之二：集合类型协议
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/2019/11/23/Swift进阶之四：结构体和类/" rel="prev" title="Swift进阶之四：结构体和类">
+                  Swift进阶之四：结构体和类 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#可选值"><span class="nav-number">1.</span> <span class="nav-text">可选值</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#哨岗值"><span class="nav-number">1.1.</span> <span class="nav-text">哨岗值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通过枚举解决魔法数问题"><span class="nav-number">1.2.</span> <span class="nav-text">通过枚举解决魔法数问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#可选值概览"><span class="nav-number">1.3.</span> <span class="nav-text">可选值概览</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#if-let"><span class="nav-number">1.3.1.</span> <span class="nav-text">if let</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#while-let"><span class="nav-number">1.3.2.</span> <span class="nav-text">while let</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#双重可选值"><span class="nav-number">1.3.3.</span> <span class="nav-text">双重可选值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#if-var-and-while-var"><span class="nav-number">1.3.4.</span> <span class="nav-text">if var and while var</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#解包后可选值的作用域"><span class="nav-number">1.3.5.</span> <span class="nav-text">解包后可选值的作用域</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#可选链"><span class="nav-number">1.3.6.</span> <span class="nav-text">可选链</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#nil-合并运算符"><span class="nav-number">1.3.7.</span> <span class="nav-text">nil 合并运算符</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#可选值-map"><span class="nav-number">1.3.8.</span> <span class="nav-text">可选值 map</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#可选值-compactMap"><span class="nav-number">1.3.9.</span> <span class="nav-text">可选值 compactMap</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#使用-compactMap-过滤-nil"><span class="nav-number">1.3.9.1.</span> <span class="nav-text">使用 compactMap 过滤 nil</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#可选值判等"><span class="nav-number">1.3.10.</span> <span class="nav-text">可选值判等</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#switch-case-匹配可选值"><span class="nav-number">1.3.11.</span> <span class="nav-text">switch-case 匹配可选值</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#强制解包的时机"><span class="nav-number">1.4.</span> <span class="nav-text">强制解包的时机</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#改进强制解包的错误信息"><span class="nav-number">1.4.1.</span> <span class="nav-text">改进强制解包的错误信息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#在调试版本中进行断言"><span class="nav-number">1.4.2.</span> <span class="nav-text">在调试版本中进行断言</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#多灾多难的隐式可选值"><span class="nav-number">1.5.</span> <span class="nav-text">多灾多难的隐式可选值</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Hsu"
+    src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">Hsu</p>
+  <div class="site-description" itemprop="description">记录一些知识，记录一些生活，记录一些足迹</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/yourname" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;yourname" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:yourname@gmail.com" title="E-Mail &amp;rarr; mailto:yourname@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/yourname" title="Weibo &amp;rarr; https:&#x2F;&#x2F;weibo.com&#x2F;yourname" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.jianshu.com/u/db56e4cae85b" title="简  书 &amp;rarr; https:&#x2F;&#x2F;www.jianshu.com&#x2F;u&#x2F;db56e4cae85b" rel="noopener" target="_blank"><i class="fa fa-fw fa-stack-overflow"></i>简  书</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/null" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title">
+      <i class="fa fa-fw fa-link"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="http://baidu.com/" title="http:&#x2F;&#x2F;baidu.com" rel="noopener" target="_blank">百度</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://google.com/" title="http:&#x2F;&#x2F;google.com" rel="noopener" target="_blank">谷歌</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Hsu</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">78k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">1:11</span>
+</div>
+
+
+  
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?0c58a1486de42ac6cc1c59c7d98ae887"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"left","width":100,"height":200},"mobile":{"show":true},"log":false,"tagMode":false});</script></body>
+</html>

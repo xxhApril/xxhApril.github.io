@@ -52,19 +52,19 @@
   };
 </script>
 
-  <meta name="description" content="前言本篇博客手动 copy 自 iOS 开发：彻底理解 iOS 内存管理（MRC、ARC）。谢谢原作者的详细分析。 正文一、什么是内存管理">
+  <meta name="description" content="前言本篇博客手动 copy 自 iOS 开发：彻底理解 iOS 内存管理（MRC、ARC）。谢谢原作者的详细分析。">
 <meta name="keywords" content="iOS,内存,面试">
 <meta property="og:type" content="article">
 <meta property="og:title" content="iOS内存管理分析">
 <meta property="og:url" content="http://xxhsu.com/2019/11/11/iOS内存管理分析/index.html">
 <meta property="og:site_name" content="风和向日葵">
-<meta property="og:description" content="前言本篇博客手动 copy 自 iOS 开发：彻底理解 iOS 内存管理（MRC、ARC）。谢谢原作者的详细分析。 正文一、什么是内存管理">
+<meta property="og:description" content="前言本篇博客手动 copy 自 iOS 开发：彻底理解 iOS 内存管理（MRC、ARC）。谢谢原作者的详细分析。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://i.loli.net/2019/10/22/C2Zypj5RcaDQJtv.png">
-<meta property="og:updated_time" content="2019-11-11T01:57:38.156Z">
+<meta property="og:updated_time" content="2019-11-22T10:36:53.306Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iOS内存管理分析">
-<meta name="twitter:description" content="前言本篇博客手动 copy 自 iOS 开发：彻底理解 iOS 内存管理（MRC、ARC）。谢谢原作者的详细分析。 正文一、什么是内存管理">
+<meta name="twitter:description" content="前言本篇博客手动 copy 自 iOS 开发：彻底理解 iOS 内存管理（MRC、ARC）。谢谢原作者的详细分析。">
 <meta name="twitter:image" content="https://i.loli.net/2019/10/22/C2Zypj5RcaDQJtv.png">
 
 <link rel="canonical" href="http://xxhsu.com/2019/11/11/iOS内存管理分析/">
@@ -177,7 +177,7 @@
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">7</span></a>
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">15</span></a>
 
   </li>
         <li class="menu-item menu-item-commonweal">
@@ -257,10 +257,16 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2019-11-11 09:56:40 / 修改时间：01:57:38" itemprop="dateCreated datePublished" datetime="2019-11-11T09:56:40Z">2019-11-11</time>
+              <time title="创建时间：2019-11-11 09:56:40" itemprop="dateCreated datePublished" datetime="2019-11-11T09:56:40Z">2019-11-11</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-11-22 10:36:53" itemprop="dateModified" datetime="2019-11-22T10:36:53Z">2019-11-22</time>
+              </span>
 
           
             <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
@@ -295,8 +301,8 @@
 
       
         <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>本篇博客手动 <code>copy</code> 自 <a href="https://www.jianshu.com/p/48665652e4e4" target="_blank" rel="noopener">iOS 开发：彻底理解 iOS 内存管理（MRC、ARC）</a>。谢谢原作者的详细分析。</p>
-<h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><h4 id="一、什么是内存管理"><a href="#一、什么是内存管理" class="headerlink" title="一、什么是内存管理"></a>一、什么是内存管理</h4><a id="more"></a>
-<ul>
+<a id="more"></a>
+<h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><h4 id="一、什么是内存管理"><a href="#一、什么是内存管理" class="headerlink" title="一、什么是内存管理"></a>一、什么是内存管理</h4><ul>
 <li>程序运行过程中，通常以下行为，会增加程序的内存使用：<ul>
 <li>创建一个对象</li>
 <li>定义一个变量</li>
@@ -638,7 +644,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-count">15</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -714,13 +720,13 @@
       <i class="fa fa-area-chart"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">62k</span>
+    <span title="站点总字数">78k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">56 分钟</span>
+    <span title="站点阅读时长">1:11</span>
 </div>
 
 
@@ -765,8 +771,6 @@
   </div>
 
   
-  
-  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
   <script src="/lib/anime.min.js"></script>
   <script src="/lib/velocity/velocity.min.js"></script>
   <script src="/lib/velocity/velocity.ui.min.js"></script>
