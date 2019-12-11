@@ -63,7 +63,7 @@
 <meta property="og:image" content="https://i.loli.net/2019/12/02/WfqAbicCIg9soKy.png">
 <meta property="og:image" content="https://i.loli.net/2019/12/09/xe4bmBUv7k6yLcp.png">
 <meta property="og:image" content="https://i.loli.net/2019/12/09/Tx1u68lUoPiXCbz.png">
-<meta property="og:updated_time" content="2019-12-11T03:14:58.081Z">
+<meta property="og:updated_time" content="2019-12-11T03:19:22.864Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="《Objective-C高级编程》三篇总结之二：Block篇">
 <meta name="twitter:description" content="这本书作者几乎通篇都在用 C、C++ 语言分析讲解 Block 的实现，初次看真的很吃力。这里推荐一篇文章">
@@ -261,7 +261,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2019-12-11 11:04:47 / 修改时间：03:14:58" itemprop="dateCreated datePublished" datetime="2019-12-11T11:04:47Z">2019-12-11</time>
+              <time title="创建时间：2019-12-11 11:04:47 / 修改时间：03:19:22" itemprop="dateCreated datePublished" datetime="2019-12-11T11:04:47Z">2019-12-11</time>
             </span>
 
           
@@ -476,24 +476,7 @@
 <p>说明不支持 __weak。</p>
 <h3 id="Block-存储域，即三种-Block"><a href="#Block-存储域，即三种-Block" class="headerlink" title="Block 存储域，即三种 Block"></a>Block 存储域，即三种 Block</h3><p>通过前面说明可知， Block 转换为 Block 结构体类型的自动变量， <strong>block 变量转换为 </strong>block 变量的结构体类型的自动变量。而所谓 <strong>结构体类型的自动变量</strong>，即栈上生成的该结构体的实例。</p>
 <p><strong>Block</strong> 与 <strong>__block</strong> 变量的实质：</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">名称</th>
-<th>实质</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">Block</td>
-<td>栈上 Block 的结构体实例</td>
-</tr>
-<tr>
-<td style="text-align:left">__block变量</td>
-<td>栈上 __block 变量的结构体实例</td>
-</tr>
-</tbody>
-</table>
+<p>名称|实质<br>|:- |:-|:-:|<br>Block|栈上 Block 的结构体实例<br><strong>block变量|栈上 </strong>block 变量的结构体实例</p>
 <p>而 Block 根据存储域的不同，可以归结为三类：</p>
 <table>
 <thead>
