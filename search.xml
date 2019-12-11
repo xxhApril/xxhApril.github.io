@@ -34,21 +34,21 @@
 </ul>
 <h3 id="Block-实质"><a href="#Block-实质" class="headerlink" title="Block 实质"></a>Block 实质</h3><p>先说结论：Block 即为 Objective-C 的对象。</p>
 <h4 id="Block-的构成"><a href="#Block-的构成" class="headerlink" title="Block 的构成"></a>Block 的构成</h4><p>以下是 block 语法的 BN 范式：</p>
-<p>Blokc_literal_expression ::= ^block_decl compound_statement_body</p>
-<p>block_decl ::=</p>
-<p>block_decl ::= parameter_list</p>
-<p>block_decl ::= type_expression</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Blokc_literal_expression ::= ^block_decl compound_statement_body</span><br><span class="line"></span><br><span class="line">block_decl ::=</span><br><span class="line"></span><br><span class="line">block_decl ::= parameter_list</span><br><span class="line"></span><br><span class="line">block_decl ::= type_expression</span><br></pre></td></tr></table></figure>
 <p>如下所示：</p>
 <p><strong><code>^</code></strong> <strong><code>返回值类型</code></strong> <strong><code>参数列表</code></strong> <strong><code>表达式</code></strong></p>
-<h4 id="表层分析-Block-实质：它是一个类型"><a href="#表层分析-Block-实质：它是一个类型" class="headerlink" title="表层分析 Block 实质：它是一个类型"></a>表层分析 Block 实质：它是一个类型</h4><p>Block 是一种类型，一旦使用了 Block 就相当于生成了可以赋值给 Block 类型变量的类型。举个例子：<br><figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> (^blk)(<span class="keyword">int</span>) = ^(<span class="keyword">int</span> count) &#123;</span><br><span class="line">    <span class="keyword">return</span> count + <span class="number">1</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<h4 id="表层分析-Block-实质：它是一个类型"><a href="#表层分析-Block-实质：它是一个类型" class="headerlink" title="表层分析 Block 实质：它是一个类型"></a>表层分析 Block 实质：它是一个类型</h4><p>Block 是一种类型，一旦使用了 Block 就相当于生成了可以赋值给 Block 类型变量的类型。举个例子：</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> (^blk)(<span class="keyword">int</span>) = ^(<span class="keyword">int</span> count) &#123;</span><br><span class="line">    <span class="keyword">return</span> count + <span class="number">1</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <ul>
 <li>等号左侧代码定义这个 Block 类型：它接受一个 int 参数，返回一个 int 值。</li>
 <li>等号右侧代码表示这个 Block 的值：它是左侧定义的 Block 的一种实现。</li>
 </ul>
-<p>如果我们项目中经常使用某个类型的 Block，可以通过 <code>typeof</code> 来抽象出这种类型的 Block，如下：<br><figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 抽象成一种类型</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">int</span> (^AddOneBlock)(<span class="keyword">int</span> count);</span><br><span class="line"></span><br><span class="line">AddOneBlock block = ^(<span class="keyword">int</span> count) &#123;</span><br><span class="line">    <span class="comment">// 具体实现代码</span></span><br><span class="line">    <span class="keyword">return</span>  count + <span class="number">1</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>如果我们项目中经常使用某个类型的 Block，可以通过 <code>typeof</code> 来抽象出这种类型的 Block，如下：</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 抽象成一种类型</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">int</span> (^AddOneBlock)(<span class="keyword">int</span> count);</span><br><span class="line"></span><br><span class="line">AddOneBlock block = ^(<span class="keyword">int</span> count) &#123;</span><br><span class="line">    <span class="comment">// 具体实现代码</span></span><br><span class="line">    <span class="keyword">return</span>  count + <span class="number">1</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <p>这样一来，Block 的赋值和传递就和普通类型一样方便了。</p>
 <h4 id="深层分析-Block-的实质：它是-Objective-C-对象"><a href="#深层分析-Block-的实质：它是-Objective-C-对象" class="headerlink" title="深层分析 Block 的实质：它是 Objective-C 对象"></a>深层分析 Block 的实质：它是 Objective-C 对象</h4><p>Block 其实就是 Objective-C 对象。它的结构体内含有 ISA 指针。</p>
-<p>下面将 Objective-C 的代码转化为 C++ 来看下实现，这里我把方法命名为 test：<br><figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="meta">#include <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="keyword">int</span> test()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">void</span> (^blk)(<span class="keyword">void</span>) = ^&#123;</span><br><span class="line">        printf(<span class="string">"Block\n"</span>);</span><br><span class="line">    &#125;;</span><br><span class="line">    blk();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>下面将 Objective-C 的代码转化为 C++ 来看下实现，这里我把方法命名为 test：</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="meta">#include <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="keyword">int</span> test()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">void</span> (^blk)(<span class="keyword">void</span>) = ^&#123;</span><br><span class="line">        printf(<span class="string">"Block\n"</span>);</span><br><span class="line">    &#125;;</span><br><span class="line">    blk();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>C++ 核心代码，这里并不是全部代码，抽取了关键部分来说：<br><figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> __<span class="title">block_impl</span> &#123;</span></span><br><span class="line">  <span class="keyword">void</span> *isa;</span><br><span class="line">  <span class="keyword">int</span> Flags;</span><br><span class="line">  <span class="keyword">int</span> Reserved;</span><br><span class="line">  <span class="keyword">void</span> *FuncPtr;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// block 结构体</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> __<span class="title">test_block_impl_0</span> &#123;</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> __<span class="title">block_impl</span> <span class="title">impl</span>;</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> __<span class="title">test_block_desc_0</span>* <span class="title">Desc</span>;</span></span><br><span class="line">  __test_block_impl_0(<span class="keyword">void</span> *fp, struct __test_block_desc_0 *desc, <span class="keyword">int</span> flags=<span class="number">0</span>) &#123;</span><br><span class="line">    impl.isa = &amp;_NSConcreteStackBlock;</span><br><span class="line">    impl.Flags = flags;</span><br><span class="line">    impl.FuncPtr = fp;</span><br><span class="line">    Desc = desc;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Block 被调用的代码，也是Block被转化为 C 语言的代码</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">void</span> __test_block_func_0(struct __test_block_impl_0 *__cself) &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"Block\n"</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 方法的描述</span></span><br><span class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">struct</span> __<span class="title">test_block_desc_0</span> &#123;</span></span><br><span class="line">  <span class="keyword">size_t</span> reserved;</span><br><span class="line">  <span class="keyword">size_t</span> Block_size;</span><br><span class="line">&#125; __test_block_desc_0_DATA = &#123; <span class="number">0</span>, <span class="keyword">sizeof</span>(struct __test_block_impl_0)&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 自己定义的 test 方法</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">test</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">void</span> (*blk)(<span class="keyword">void</span>) = ((<span class="keyword">void</span> (*)())&amp;__test_block_impl_0((<span class="keyword">void</span> *)__test_block_func_0, &amp;__test_block_desc_0_DATA));</span><br><span class="line">    ((<span class="keyword">void</span> (*)(__block_impl *))((__block_impl *)blk)-&gt;FuncPtr)((__block_impl *)blk);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>先来看下 OC 中源代码 block 语法 <code>^{printf(&quot;Block\n&quot;)};</code> 变化成 C++ 后：<br><figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">void</span> __test_block_func_0(struct __test_block_impl_0 *__cself) &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"Block\n"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>该函数的参数 <strong>cself 相当于 C++ 实例方法中指向自身实例方法的 this，或是 OC 实例方法中指向对象自身的变量 self，即参数 </strong>cself 为指向 Block 值的变量，也是 __test_block_impl_0 结构体的指针。</p>
@@ -107,7 +107,25 @@
 <p>在 OC 中， C 语言的结构体不能含有 __strong 修饰符的变量，因为编译器不知道应该何时进行 C 语言结构体的初始化和废弃操作，不能很好地管理内存。</p>
 <p>但是 OC 的运行时库能够准确的把握 Block 从栈复制到堆以及堆上的 Block 函数被废弃的时机。在实现上是通过 <code>__testBlock_block_copy_0</code> 和 <code>__testBlock_block_dispose_0</code> 两个函数进行的：<br><figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">void</span> __testBlock_block_copy_0(<span class="keyword">struct</span> __testBlock_block_impl_0*dst, <span class="keyword">struct</span> __testBlock_block_impl_0*src) &#123;</span><br><span class="line">    _Block_object_assign((<span class="keyword">void</span>*)&amp;dst-&gt;array, (<span class="keyword">void</span>*)src-&gt;array, <span class="number">3</span><span class="comment">/*BLOCK_FIELD_IS_OBJECT*/</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">void</span> __testBlock_block_dispose_0(<span class="keyword">struct</span> __testBlock_block_impl_0*src) &#123;</span><br><span class="line">    _Block_object_dispose((<span class="keyword">void</span>*)src-&gt;array, <span class="number">3</span><span class="comment">/*BLOCK_FIELD_IS_OBJECT*/</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>其中，<code>_Block_object_assign</code> 函数相当于 retain 实例方法的函数，将对象赋值在对象类型的结构体成员变量中。 <code>_Block_object_dispose</code> 函数相当于调用 release 实例方法的函数，释放赋值在对象结类型的构体结构体成员变量中的对象。</p>
-<p>这两个函数在源码中并没有被调用，而是在 Block 从栈复制到堆上时以及堆上的 block 被废弃时会调用这些函数，如下表：<strong>调用 copy 函数 和 dispose 函数的时机</strong><br>函数|调用时机<br>:—–|——–|<br>copy 函数|栈上的 Block 复制到堆时<br>dispose 函数 | 堆上的 Block 被废弃时</p>
+<p>这两个函数在源码中并没有被调用，而是在 Block 从栈复制到堆上时以及堆上的 block 被废弃时会调用这些函数，如下表：<strong>调用 copy 函数 和 dispose 函数的时机</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">函数</th>
+<th>调用时机</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">copy 函数</td>
+<td>栈上的 Block 复制到堆时</td>
+</tr>
+<tr>
+<td style="text-align:left">dispose 函数</td>
+<td>堆上的 Block 被废弃时</td>
+</tr>
+</tbody>
+</table>
 <p><strong>什么时候栈上的 Block 会复制到堆上呢？</strong></p>
 <ul>
 <li>调用 Block 的 copy 实例方法时</li>
@@ -164,8 +182,52 @@
       does not support weak references</code>。</p>
 <p>说明不支持 __weak。</p>
 <h3 id="Block-存储域，即三种-Block"><a href="#Block-存储域，即三种-Block" class="headerlink" title="Block 存储域，即三种 Block"></a>Block 存储域，即三种 Block</h3><p>通过前面说明可知， Block 转换为 Block 结构体类型的自动变量， <strong>block 变量转换为 </strong>block 变量的结构体类型的自动变量。而所谓 <strong>结构体类型的自动变量</strong>，即栈上生成的该结构体的实例。</p>
-<p><strong>Block</strong> 与 <strong>__block</strong> 变量的实质：<br>名称|实质<br>:——–|———|<br>Block|栈上 Block 的结构体实例<br><strong>block变量|栈上 </strong>block 变量的结构体实例</p>
-<p>而 Block 根据存储域的不同，可以归结为三类：<br>Block 的类|存储域|拷贝效果<br>:——-|——–|———-|<br>_NSConcreteStackBlock|栈|从栈拷贝到堆<br>_NSConcreteGlobalBlock|程序的数据区域(.data)|什么也不做<br>_NSConcreteMallocBlock|堆|引用计数增加</p>
+<p><strong>Block</strong> 与 <strong>__block</strong> 变量的实质：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">名称</th>
+<th>实质</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Block</td>
+<td>栈上 Block 的结构体实例</td>
+</tr>
+<tr>
+<td style="text-align:left">__block变量</td>
+<td>栈上 __block 变量的结构体实例</td>
+</tr>
+</tbody>
+</table>
+<p>而 Block 根据存储域的不同，可以归结为三类：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Block 的类</th>
+<th>存储域</th>
+<th>拷贝效果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">_NSConcreteStackBlock</td>
+<td>栈</td>
+<td>从栈拷贝到堆</td>
+</tr>
+<tr>
+<td style="text-align:left">_NSConcreteGlobalBlock</td>
+<td>程序的数据区域(.data)</td>
+<td>什么也不做</td>
+</tr>
+<tr>
+<td style="text-align:left">_NSConcreteMallocBlock</td>
+<td>堆</td>
+<td>引用计数增加</td>
+</tr>
+</tbody>
+</table>
 <h4 id="全局-Block-NSConcreteGlobalBlock"><a href="#全局-Block-NSConcreteGlobalBlock" class="headerlink" title="全局 Block: _NSConcreteGlobalBlock"></a>全局 Block: _NSConcreteGlobalBlock</h4><p>因为全局 Block 的结构体实例设置在程序的数据存储区，可以在程序任意位置通知指针来访问，只有两种情况下会产生全局 Block：</p>
 <ul>
 <li>记述全局变量的地方有 Block 语法时。</li>
@@ -180,7 +242,33 @@
 <p>配置在全局变量上的 Block，从变量作用域外也可通过指针安全的使用。但设置在栈上的 Block，如果其所属变量作用域结束，该 Block 就被废弃。由于 <strong>block 变量也配置在栈上，同样，其所属的变量作用域结束，则该 </strong>block 变量也被废弃。</p>
 <p>Blocks 机制提供了将 Block 和 __block 变量从栈上复制到堆上的方法来解决这个问题。将配置在栈上的 Block 复制到堆上，这样即使 Block 语法记述的变量作用域结束，堆上的 Block 还可以继续存在。</p>
 <h4 id="堆-Block：-NSConcreteMallocBlock"><a href="#堆-Block：-NSConcreteMallocBlock" class="headerlink" title="堆 Block：_NSConcreteMallocBlock"></a>堆 Block：_NSConcreteMallocBlock</h4><p>将栈 Block 复制到堆后，block结构体的 ISA 成员变量变成了 _NSConcreteMallocBlock。</p>
-<p>在对 Block 使用 copy 实例方法时:<br>Block 的类|副本源的配置存储域|复制（copy）效果<br>:——-|——–|——–|<br>_NSConcreteStackBlock|栈|从栈拷贝到堆<br>_NSConcreteGlobalBlock|程序的数据区域|什么也不做<br>_NSConcreteMallocBlock|堆|引用计数增加</p>
+<p>在对 Block 使用 copy 实例方法时:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Block 的类</th>
+<th>副本源的配置存储域</th>
+<th>复制（copy）效果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">_NSConcreteStackBlock</td>
+<td>栈</td>
+<td>从栈拷贝到堆</td>
+</tr>
+<tr>
+<td style="text-align:left">_NSConcreteGlobalBlock</td>
+<td>程序的数据区域</td>
+<td>什么也不做</td>
+</tr>
+<tr>
+<td style="text-align:left">_NSConcreteMallocBlock</td>
+<td>堆</td>
+<td>引用计数增加</td>
+</tr>
+</tbody>
+</table>
 <blockquote>
 <p>不管 Block 配置之在何处，用 copy 方法都不会引起任何问题，在不确定时调用 copy 方法即可。</p>
 </blockquote>
