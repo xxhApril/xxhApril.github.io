@@ -183,7 +183,24 @@
 <p>说明不支持 __weak。</p>
 <h3 id="Block-存储域，即三种-Block"><a href="#Block-存储域，即三种-Block" class="headerlink" title="Block 存储域，即三种 Block"></a>Block 存储域，即三种 Block</h3><p>通过前面说明可知， Block 转换为 Block 结构体类型的自动变量， <strong>block 变量转换为 </strong>block 变量的结构体类型的自动变量。而所谓 <strong>结构体类型的自动变量</strong>，即栈上生成的该结构体的实例。</p>
 <p><strong>Block</strong> 与 <strong>__block</strong> 变量的实质：</p>
-<p>名称|实质<br>|:- |:-|:-:|<br>Block|栈上 Block 的结构体实例<br><strong>block变量|栈上 </strong>block 变量的结构体实例</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">名称</th>
+<th>实质</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Block</td>
+<td>栈上 Block 的结构体实例</td>
+</tr>
+<tr>
+<td style="text-align:left">__block变量</td>
+<td>栈上 __block 变量的结构体实例</td>
+</tr>
+</tbody>
+</table>
 <p>而 Block 根据存储域的不同，可以归结为三类：</p>
 <table>
 <thead>
