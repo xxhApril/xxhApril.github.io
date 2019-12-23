@@ -82,7 +82,13 @@
 </ol>
 <p>下面通过完整的图来感受下：</p>
 <p><img src="https://i.loli.net/2019/12/23/eKSDkvJTfwoQgLF.png" alt="iOS响应者链.png"></p>
-<h2 id="App-启动时做了什么"><a href="#App-启动时做了什么" class="headerlink" title="App 启动时做了什么"></a>App 启动时做了什么</h2><p>手动 copy 自：<a href="https://time.geekbang.org/column/article/85331" target="_blank" rel="noopener">戴铭 iOS开发高手课  02 | App 启动速度怎么做优化与监控？</a></p>
+<h2 id="App-启动时做了什么"><a href="#App-启动时做了什么" class="headerlink" title="App 启动时做了什么"></a>App 启动时做了什么</h2><p><strong>通过添加环境变量可以打印出 App 的启动时间分析:</strong></p>
+<p>Edit scheme -&gt; Run -&gt; Arguments -&gt; Environment Variables:</p>
+<ul>
+<li>添加：DYLD_PRINT_STATISTICS，设置为 1。</li>
+<li>如果需要更详细的信息，那就添加：DYLD_PRINT_STATISTICS_DETAILS，设置为 1。</li>
+</ul>
+<p>以下手动 copy 自：<a href="https://time.geekbang.org/column/article/85331" target="_blank" rel="noopener">戴铭 iOS开发高手课  02 | App 启动速度怎么做优化与监控？</a></p>
 <p>这里不对优化做过多细节分析。主要了解 APP 从点击到渲染出来第一个页面，中间做了什么。</p>
 <h3 id="App-启动类型"><a href="#App-启动类型" class="headerlink" title="App 启动类型"></a>App 启动类型</h3><p>一般情况下，App 的启动分为冷启动和热启动：</p>
 <ul>
