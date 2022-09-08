@@ -1,50 +1,24 @@
 <?xml version="1.0"?>
-<feed xmlns="http://www.w3.org/2005/Atom">
-    <id>http://xxhapril.github.io</id>
-    <title>风和向日葵</title>
-    <link href="http://xxhapril.github.io" />
-    <updated>2022-09-08T00:00:00.000Z</updated>
-    <category term="隐私政策" />
-    <category term="用户隐私" />
-    <category term="面试" />
-    <category term="iOS" />
-    <entry>
-        <id>http://xxhapril.github.io/2022/09/08/%E9%9A%90%E7%A7%81%E6%94%BF%E7%AD%96/</id>
-        <title>隐私协议</title>
-        <link rel="alternate" href="http://xxhapril.github.io/2022/09/08/%E9%9A%90%E7%A7%81%E6%94%BF%E7%AD%96/"/>
-        <content type="html">&lt;h3 id=&#34;本应用隐私保护协议&#34;&gt;&lt;a class=&#34;markdownIt-Anchor&#34; href=&#34;#本应用隐私保护协议&#34;&gt;#&lt;/a&gt; 本应用隐私保护协议&lt;/h3&gt;
-&lt;p&gt;本应用尊重并保护所有使用本应用网络服务的个人的隐私。本隐私权政策（以下称 &amp;quot;隐私权政策&amp;quot;）规定，未事先得到您的同意，我们不会有意将涉及您个人隐私的内容透露给任何第三方，但本政策另有说明的除外。&lt;/p&gt;
-&lt;h4 id=&#34;1-我们需要哪些访问权限&#34;&gt;&lt;a class=&#34;markdownIt-Anchor&#34; href=&#34;#1-我们需要哪些访问权限&#34;&gt;#&lt;/a&gt; 1. 我们需要哪些访问权限&lt;/h4&gt;
-&lt;p&gt;(1) 访问网络权限&lt;br&gt;
- (2) 访问相册权限&lt;/p&gt;
-&lt;h4 id=&#34;2-为什么我们需要这些访问权限&#34;&gt;&lt;a class=&#34;markdownIt-Anchor&#34; href=&#34;#2-为什么我们需要这些访问权限&#34;&gt;#&lt;/a&gt; 2. 为什么我们需要这些访问权限&lt;/h4&gt;
-&lt;p&gt;(1) 访问网络权限 - 我们提供在线画报，需要从网络上获取画报列表和图片，所以需要访问网络权限&lt;br&gt;
- (2) 访问相册权限 - 我们提供保存图片到相册功能，所以需要访问相册权限&lt;/p&gt;
-&lt;h4 id=&#34;3-本应用和ip设备等信息&#34;&gt;&lt;a class=&#34;markdownIt-Anchor&#34; href=&#34;#3-本应用和ip设备等信息&#34;&gt;#&lt;/a&gt; 3. 本应用和 IP，设备等信息&lt;/h4&gt;
-&lt;p&gt;在您首次访问本应用后，本应用会对服务器发送网络请求。请求中会携带您设备的 IP，IP 地址是指互联网协议地址（英语：Internet Protocol Address，又译为网际协议地址），是 IP Address 的缩写。 IP 地址是 IP 协议提供的一种统一的地址格式，它为互联网上的每一个网络和每一台主机分配一个逻辑地址，以此来屏蔽物理地址的差异。用于标识不同的访问用户。本应用使用 cookie 来提高我们的服务质量并更多地了解用户群体。IP 所承载您的个人信息均视为您个人隐私，本应用将依照用户隐私政策进行保护。&lt;/p&gt;
-&lt;h4 id=&#34;4-我们收集哪些信息&#34;&gt;&lt;a class=&#34;markdownIt-Anchor&#34; href=&#34;#4-我们收集哪些信息&#34;&gt;#&lt;/a&gt; 4. 我们收集哪些信息？&lt;/h4&gt;
-&lt;p&gt;(1) 我们可能会搜集使用脸部轮廓信息。 用户在使用人像抠图，人物动漫化，人物变老，男变女，女变男，人物动漫化功能时，上传的图片中如果包含人脸信息，我们会在处理过程中使用这些人脸的脸部轮廓信息，用于人工智能算法的处理。我们不存储，不共享这些脸部轮廓信息。处理完成后的图片，因为需要提供下载结果服务，会在服务器存储 24 小时，24 小时候会定时清除。&lt;br&gt;
-(2) 本应用不收集有关您的任何特定信息，除非您特意提供了此类信息或者您已经同意我们收集此类信息。本应用所记录和保存的信息包括：时间、手机设备类型、应用语言和用户 IP 地址等。这些信息用于核实我们的记录并向用户提供更适合需要的服务。&lt;/p&gt;
-&lt;h4 id=&#34;5-本应用隐私政策的具体内容&#34;&gt;&lt;a class=&#34;markdownIt-Anchor&#34; href=&#34;#5-本应用隐私政策的具体内容&#34;&gt;#&lt;/a&gt; 5. 本应用隐私政策的具体内容&lt;/h4&gt;
-&lt;p&gt;保护用户隐私是本应用的一项基本政策，本应用保证不对外公开或向第三方提供您的申请资料及您在使用网络服务时存储在本应用的个人信息，但下列情况除外：&lt;/p&gt;
-&lt;p&gt;(a) 事先获得用户的明确授权；&lt;br&gt;
-(b) 根据有关的法律法规要求；&lt;br&gt;
-© 按照相关政府主管部门的要求；&lt;br&gt;
-(d) 为维护社会公众的利益；&lt;br&gt;
-(e) 为维护本应用的合法权益。&lt;/p&gt;
-&lt;p&gt;本应用可能会与第三方合作向您提供相关的网络服务，在此情况下，如该第三方同意承担与本应用同等的保护用户隐私的责任，则本应用可将您的个人信息等提供给该第三方。在不透露您隐私资料的前提下，本应用有权对整个用户数据库进行分析并对用户数据库进行商业上的利用（包括但不限于公布、分析或以其它方式使用用户访问量、访问时段、用户偏好等用户数据信息）。&lt;/p&gt;
-&lt;h4 id=&#34;6-对隐私权政策的认同和修订&#34;&gt;&lt;a class=&#34;markdownIt-Anchor&#34; href=&#34;#6-对隐私权政策的认同和修订&#34;&gt;#&lt;/a&gt; 6. 对隐私权政策的认同和修订&lt;/h4&gt;
-&lt;p&gt;您在使用本应用网络服务，即表示您同意我们收集并使用您的资料（如本政策所述），并表示您认同我们的网络服务使用协议。本应用保留修改此隐私权政策的权力。如果您不同意本应用修改的内容，您可以主动退出应用，不使用本应用提供的服务。如果您在修改内容公告后 15 天内未主动取消服务，则视为接受本政策的变更；修改内容公告后您如果仍继续使用本应用提供的产品和服务亦构成对本政策变更的接受。&lt;/p&gt;
-</content>
-        <category term="隐私政策" />
-        <category term="用户隐私" />
-        <updated>2022-09-08T00:00:00.000Z</updated>
-    </entry>
-    <entry>
-        <id>http://xxhapril.github.io/2022/09/07/%E3%80%8AiOS%E9%9D%A2%E8%AF%95%E4%B9%8B%E9%81%93%E3%80%8B%E4%B8%A4%E7%AF%87%E6%80%BB%E7%BB%93%E4%B9%8B%E4%BA%8C%EF%BC%9A%E7%AE%97%E6%B3%95%E5%9F%BA%E7%A1%80%E7%AF%87/</id>
-        <title>《iOS面试之道》两篇总结之二：算法基础篇</title>
-        <link rel="alternate" href="http://xxhapril.github.io/2022/09/07/%E3%80%8AiOS%E9%9D%A2%E8%AF%95%E4%B9%8B%E9%81%93%E3%80%8B%E4%B8%A4%E7%AF%87%E6%80%BB%E7%BB%93%E4%B9%8B%E4%BA%8C%EF%BC%9A%E7%AE%97%E6%B3%95%E5%9F%BA%E7%A1%80%E7%AF%87/"/>
-        <content type="html">&lt;p&gt;《iOS 面试之道》是故胤道长和唐巧 2018 年合著的针对面试一些问题的书，买之后虽有翻阅，但是始终未认真通读。现在想把书中对于我来说有价值的知识点，简短的总结一下。这里分两篇来说，这篇主要是介绍一些算法基础。&lt;/p&gt;
+<rss version="2.0">
+    <channel>
+        <title>风和向日葵 • Posts by &#34;技术&#34; category</title>
+        <link>http://xxhapril.github.io</link>
+        <description>记录一些知识，记录一些生活，记录一些足迹</description>
+        <language>zh-Hans</language>
+        <pubDate>Wed, 07 Sep 2022 08:00:00 +0800</pubDate>
+        <lastBuildDate>Wed, 07 Sep 2022 08:00:00 +0800</lastBuildDate>
+        <category>隐私政策</category>
+        <category>用户隐私</category>
+        <category>面试</category>
+        <category>iOS</category>
+        <item>
+            <guid isPermalink="true">http://xxhapril.github.io/2022/09/07/%E3%80%8AiOS%E9%9D%A2%E8%AF%95%E4%B9%8B%E9%81%93%E3%80%8B%E4%B8%A4%E7%AF%87%E6%80%BB%E7%BB%93%E4%B9%8B%E4%BA%8C%EF%BC%9A%E7%AE%97%E6%B3%95%E5%9F%BA%E7%A1%80%E7%AF%87/</guid>
+            <title>《iOS面试之道》两篇总结之二：算法基础篇</title>
+            <link>http://xxhapril.github.io/2022/09/07/%E3%80%8AiOS%E9%9D%A2%E8%AF%95%E4%B9%8B%E9%81%93%E3%80%8B%E4%B8%A4%E7%AF%87%E6%80%BB%E7%BB%93%E4%B9%8B%E4%BA%8C%EF%BC%9A%E7%AE%97%E6%B3%95%E5%9F%BA%E7%A1%80%E7%AF%87/</link>
+            <category>面试</category>
+            <category>iOS</category>
+            <pubDate>Wed, 07 Sep 2022 08:00:00 +0800</pubDate>
+            <description><![CDATA[ &lt;p&gt;《iOS 面试之道》是故胤道长和唐巧 2018 年合著的针对面试一些问题的书，买之后虽有翻阅，但是始终未认真通读。现在想把书中对于我来说有价值的知识点，简短的总结一下。这里分两篇来说，这篇主要是介绍一些算法基础。&lt;/p&gt;
 &lt;span id=&#34;more&#34;&gt;&lt;/span&gt;
 &lt;p&gt;&lt;a href=&#34;&#34;&gt;《iOS 面试之道》两篇总结之一：开发技能篇&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;&lt;a href=&#34;&#34;&gt;《iOS 面试之道》两篇总结之二：算法基础篇&lt;/a&gt;&lt;/p&gt;
@@ -125,16 +99,16 @@
 &lt;p&gt;实现代码如下：&lt;/p&gt;
 &lt;figure class=&#34;highlight swift&#34;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&#34;gutter&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;4&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;5&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;6&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;7&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;8&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;9&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;10&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;11&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;12&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;13&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;14&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;15&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;16&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;17&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;18&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;19&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;20&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;21&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;22&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;23&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;24&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;25&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;26&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;27&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;28&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;29&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;30&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;31&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;32&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;33&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;34&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;35&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;36&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&#34;code&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;keyword&#34;&gt;func&lt;/span&gt; &lt;span class=&#34;title function_&#34;&gt;simplifyPath&lt;/span&gt;(&lt;span class=&#34;params&#34;&gt;path&lt;/span&gt;: &lt;span class=&#34;type&#34;&gt;String&lt;/span&gt;) -&amp;gt; &lt;span class=&#34;type&#34;&gt;String&lt;/span&gt; &amp;#123;&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;    &lt;span class=&#34;comment&#34;&gt;// 用数组来实现栈的功能&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;    &lt;span class=&#34;keyword&#34;&gt;var&lt;/span&gt; pathStack &lt;span class=&#34;operator&#34;&gt;=&lt;/span&gt; [&lt;span class=&#34;type&#34;&gt;String&lt;/span&gt;]()&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;    &lt;span class=&#34;comment&#34;&gt;// 拆分原路径&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;    &lt;span class=&#34;keyword&#34;&gt;let&lt;/span&gt; paths &lt;span class=&#34;operator&#34;&gt;=&lt;/span&gt; path.components(separatedBy: &lt;span class=&#34;string&#34;&gt;&amp;quot;/&amp;quot;&lt;/span&gt;)&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;    &lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;    &lt;span class=&#34;keyword&#34;&gt;for&lt;/span&gt; path &lt;span class=&#34;keyword&#34;&gt;in&lt;/span&gt; paths &amp;#123;&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;        &lt;span class=&#34;built_in&#34;&gt;print&lt;/span&gt;(&lt;span class=&#34;string&#34;&gt;&amp;quot;path = &lt;span class=&#34;subst&#34;&gt;\(path)&lt;/span&gt;&amp;quot;&lt;/span&gt;)&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;        &lt;span class=&#34;keyword&#34;&gt;guard&lt;/span&gt; path &lt;span class=&#34;operator&#34;&gt;!=&lt;/span&gt; &lt;span class=&#34;string&#34;&gt;&amp;quot;.&amp;quot;&lt;/span&gt; &lt;span class=&#34;keyword&#34;&gt;else&lt;/span&gt; &amp;#123;&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;            &lt;span class=&#34;keyword&#34;&gt;continue&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;        &amp;#125;&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;        &lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;        &lt;span class=&#34;comment&#34;&gt;// 对 .. 使用 pop 操作&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;        &lt;span class=&#34;keyword&#34;&gt;if&lt;/span&gt; path &lt;span class=&#34;operator&#34;&gt;==&lt;/span&gt; &lt;span class=&#34;string&#34;&gt;&amp;quot;..&amp;quot;&lt;/span&gt; &amp;#123;&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;            &lt;span class=&#34;keyword&#34;&gt;if&lt;/span&gt; pathStack.count &lt;span class=&#34;operator&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;number&#34;&gt;0&lt;/span&gt; &amp;#123;&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;                pathStack.removeLast()&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;            &amp;#125; &lt;span class=&#34;keyword&#34;&gt;else&lt;/span&gt; &amp;#123;&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;                &lt;span class=&#34;comment&#34;&gt;// 数组为空，上来就是 .. 则不操作&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;            &amp;#125;&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;        &amp;#125; &lt;span class=&#34;keyword&#34;&gt;else&lt;/span&gt; &lt;span class=&#34;keyword&#34;&gt;if&lt;/span&gt; path &lt;span class=&#34;operator&#34;&gt;!=&lt;/span&gt; &lt;span class=&#34;string&#34;&gt;&amp;quot;&amp;quot;&lt;/span&gt; &amp;#123;&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;            pathStack.append(path)&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;        &amp;#125; &lt;span class=&#34;keyword&#34;&gt;else&lt;/span&gt; &amp;#123;&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;            &lt;span class=&#34;comment&#34;&gt;// 空路径，不用处理&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;        &amp;#125;&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;        &lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;    &amp;#125;&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;    &lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;    &lt;span class=&#34;built_in&#34;&gt;print&lt;/span&gt;(&lt;span class=&#34;string&#34;&gt;&amp;quot;stacks = &lt;span class=&#34;subst&#34;&gt;\(pathStack)&lt;/span&gt;&amp;quot;&lt;/span&gt;)&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;    &lt;span class=&#34;comment&#34;&gt;/// 将栈中的内容转化为优化后的新路径&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;    &lt;span class=&#34;keyword&#34;&gt;let&lt;/span&gt; res &lt;span class=&#34;operator&#34;&gt;=&lt;/span&gt; pathStack.reduce(&lt;span class=&#34;string&#34;&gt;&amp;quot;&amp;quot;&lt;/span&gt;) &amp;#123; totol, dir &lt;span class=&#34;keyword&#34;&gt;in&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;        &lt;span class=&#34;string&#34;&gt;&amp;quot;&lt;span class=&#34;subst&#34;&gt;\(totol)&lt;/span&gt;/&lt;span class=&#34;subst&#34;&gt;\(dir)&lt;/span&gt;&amp;quot;&lt;/span&gt;&amp;#125;&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;    &lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;    &lt;span class=&#34;comment&#34;&gt;// 注意空路径的结果是 /&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;    &lt;span class=&#34;keyword&#34;&gt;return&lt;/span&gt; res.isEmpty &lt;span class=&#34;operator&#34;&gt;?&lt;/span&gt; &lt;span class=&#34;string&#34;&gt;&amp;quot;/&amp;quot;&lt;/span&gt; : res&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;&amp;#125;&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
 &lt;h2 id=&#34;二叉树&#34;&gt;&lt;a class=&#34;markdownIt-Anchor&#34; href=&#34;#二叉树&#34;&gt;#&lt;/a&gt; 二叉树&lt;/h2&gt;
-</content>
-        <category term="面试" />
-        <category term="iOS" />
-        <updated>2022-09-07T00:00:00.000Z</updated>
-    </entry>
-    <entry>
-        <id>http://xxhapril.github.io/2022/09/07/%E3%80%8AiOS%E9%9D%A2%E8%AF%95%E4%B9%8B%E9%81%93%E3%80%8B%E4%B8%A4%E7%AF%87%E6%80%BB%E7%BB%93%E4%B9%8B%E4%B8%80%EF%BC%9A%E4%B8%93%E4%B8%9A%E9%97%AE%E7%AD%94%E7%AF%87/</id>
-        <title>《iOS面试之道》两篇总结之一：开发技能篇</title>
-        <link rel="alternate" href="http://xxhapril.github.io/2022/09/07/%E3%80%8AiOS%E9%9D%A2%E8%AF%95%E4%B9%8B%E9%81%93%E3%80%8B%E4%B8%A4%E7%AF%87%E6%80%BB%E7%BB%93%E4%B9%8B%E4%B8%80%EF%BC%9A%E4%B8%93%E4%B8%9A%E9%97%AE%E7%AD%94%E7%AF%87/"/>
-        <content type="html">&lt;p&gt;《iOS 面试之道》是故胤道长和唐巧 2018 年合著的针对面试一些问题的书，买之后虽有翻阅，但是始终未认真通读。现在想把书中对于我来说有价值的知识点，简短的总结一下。这里分两篇来说，算法基础放到下篇吧。&lt;/p&gt;
+ ]]></description>
+        </item>
+        <item>
+            <guid isPermalink="true">http://xxhapril.github.io/2022/09/07/%E3%80%8AiOS%E9%9D%A2%E8%AF%95%E4%B9%8B%E9%81%93%E3%80%8B%E4%B8%A4%E7%AF%87%E6%80%BB%E7%BB%93%E4%B9%8B%E4%B8%80%EF%BC%9A%E4%B8%93%E4%B8%9A%E9%97%AE%E7%AD%94%E7%AF%87/</guid>
+            <title>《iOS面试之道》两篇总结之一：开发技能篇</title>
+            <link>http://xxhapril.github.io/2022/09/07/%E3%80%8AiOS%E9%9D%A2%E8%AF%95%E4%B9%8B%E9%81%93%E3%80%8B%E4%B8%A4%E7%AF%87%E6%80%BB%E7%BB%93%E4%B9%8B%E4%B8%80%EF%BC%9A%E4%B8%93%E4%B8%9A%E9%97%AE%E7%AD%94%E7%AF%87/</link>
+            <category>面试</category>
+            <category>iOS</category>
+            <pubDate>Wed, 07 Sep 2022 08:00:00 +0800</pubDate>
+            <description><![CDATA[ &lt;p&gt;《iOS 面试之道》是故胤道长和唐巧 2018 年合著的针对面试一些问题的书，买之后虽有翻阅，但是始终未认真通读。现在想把书中对于我来说有价值的知识点，简短的总结一下。这里分两篇来说，算法基础放到下篇吧。&lt;/p&gt;
 &lt;span id=&#34;more&#34;&gt;&lt;/span&gt;
 &lt;p&gt;&lt;a href=&#34;&#34;&gt;《iOS 面试之道》两篇总结之一：开发技能篇&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;&lt;a href=&#34;&#34;&gt;《iOS 面试之道》两篇总结之二：算法基础篇&lt;/a&gt;&lt;/p&gt;
@@ -598,9 +572,7 @@
 &lt;h4 id=&#34;比较关键词-serial-concurrent-sync-async&#34;&gt;&lt;a class=&#34;markdownIt-Anchor&#34; href=&#34;#比较关键词-serial-concurrent-sync-async&#34;&gt;#&lt;/a&gt; 比较关键词： Serial、Concurrent、Sync、Async&lt;/h4&gt;
 &lt;p&gt;串行、并行、同步、异步，更多详细信息，可参考 &lt;a href=&#34;https://www.jianshu.com/p/ef519348c733&#34;&gt;《Objective-C 高级编程》三篇总结之三：GCD 篇&lt;/a&gt;。&lt;/p&gt;
 &lt;p&gt;另外，并发编程三大问题、GCD 信号量、栅栏等，都可参考这篇文章。&lt;/p&gt;
-</content>
-        <category term="面试" />
-        <category term="iOS" />
-        <updated>2022-09-07T00:00:00.000Z</updated>
-    </entry>
-</feed>
+ ]]></description>
+        </item>
+    </channel>
+</rss>
